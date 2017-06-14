@@ -1,8 +1,9 @@
 <?php
 
 use NYPL\Services\Model\HoldRequest\NewHoldRequest;
+use PHPUnit\Framework\TestCase;
 
-class NewHoldRequestTest extends PHPUnit_Framework_TestCase
+class NewHoldRequestTest extends TestCase
 {
     public $fakeHoldRequest;
 
