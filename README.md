@@ -31,57 +31,39 @@ status.
 A Hold Request is governed by the following Avro 1.8.1 schema:
 
 ## Schema
-
-## Sierra API PatronHoldPost
-(https://sandbox.iii.com/iii/sierra-api/swagger/index.html#!/patrons)
-endpoint: POST /v3/patrons/{id}/hold/request
 ~~~
 {
+  "patron": "string",
+  "requestType": "string",
+  "nyplSource": "string",
   "recordType": "string",
-  "recordNumber": "integer",
+  "record": "string",
   "pickupLocation": "string",
   "neededBy": "string",
-  "numberOfCopies": "integer"
+  "numberOfCopies": "int",
+  "docDeliveryData": {
+    "chapterTitle": "string",
+    "emailAddress": "string",
+    "startPage": "string",
+    "endPage": "string",
+    "issue": "string",
+    "volume": "string"
+  }
 }
 ~~~
 
-## Sierra Hold Request (POST)
+## Hold Request Data
 
 * recordType - (b, i, j)
-* recordNumber - bibId (b), itemId (i), volumeId (j)
+* record - identifier [bibId (b), itemId (i), volumeId (j)]
 * pickupLocation - NYPL location identifier
 * neededBy - date when hold is terminated (business rules?)
 * numberOfCopies - should always be 1 for ReCAP
 
 ## ReCAP API RequestItem
 (https://uat-recap.htcinc.com:9093/swagger-ui.html#/)
-~~~
-{
-  "author": "string",
-  "bibId": "string",
-  "callNumber": "string",
-  "chapterTitle": "string",
-  "deliveryLocation": "string",
-  "emailAddress": "string",
-  "endPage": "string",
-  "issue": "string",
-  "itemBarcodes": [
-    "string"
-  ],
-  "itemOwningInstitution": "string",
-  "patronBarcode": "string",
-  "requestNotes": "string",
-  "requestType": "string",
-  "requestingInstitution": "string",
-  "startPage": "string",
-  "titleIdentifier": "string",
-  "trackingId": "string",
-  "username": "string",
-  "volume": "string"
-}
-~~~
 
-## ReCAP Request Items
+## ReCAP Request Data
 
 * All require requestType, itemBarcodes, patronBarcode, trackingId, bibId,
 itemOwningInstitution, requestingInstitution
