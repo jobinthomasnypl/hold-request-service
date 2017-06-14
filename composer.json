@@ -1,0 +1,21 @@
+{
+  "name": "nypl-hold-request-service",
+  "description": "NYPL Hold Request Service Package",
+  "require": {
+    "nypl/microservice-starter": "~1.0.9",
+    "ramsey/uuid": "~3.6.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~5.6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "NYPL\\Services\\": [ "src/", "tests/" ]
+    }
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "php -r \"copy('vendor/nypl/microservice-starter/scripts/index.js', 'index.js');\""
+    ]
+  }
+}
