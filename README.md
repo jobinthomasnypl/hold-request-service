@@ -1,5 +1,8 @@
 # NYPL Hold Request Service
 
+[![Build Status](https://travis-ci.org/NYPL/hold-request-service.svg?branch=master)](https://travis-ci.org/NYPL/hold-request-service)
+[![Coverage Status](https://coveralls.io/repos/github/NYPL/hold-request-service/badge.svg?branch=travis)](https://coveralls.io/github/NYPL/hold-request-service?branch=travis)
+
 This package is intended to be used as a Lambda-based Hold Request Service using the [NYPL PHP Microservice Starter](https://github.com/NYPL/php-microservice-starter).
 
 This package adheres to [PSR-1](http://www.php-fig.org/psr/psr-1/), [PSR-2](http://www.php-fig.org/psr/psr-2/), and [PSR-4](http://www.php-fig.org/psr/psr-4/) (using the [Composer](https://getcomposer.org/) autoloader).
