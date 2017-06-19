@@ -4,6 +4,7 @@ namespace NYPL\Services\Controller;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\HoldRequestResponse;
+use NYPL\Starter\APIException;
 use NYPL\Starter\Filter;
 use Ramsey\Uuid\Uuid;
 use Slim\Http\Request;
@@ -18,9 +19,9 @@ class HoldRequestController extends ServiceController
 {
     /**
      * @SWG\Post(
-     *     path="/v0.2/hold-requests",
+     *     path="/v0.1/hold-requests",
      *     summary="Create new hold request",
-     *     tags={"hold-requests"},
+     *     tags={"holds-service"},
      *     operationId="createHoldRequest",
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -43,12 +44,12 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
@@ -56,28 +57,43 @@ class HoldRequestController extends ServiceController
      *         }
      *     }
      * )
+     *
+     * @return Response
+     * @throws APIException
      */
     public function createHoldRequest()
     {
-        $data = $this->getRequest()->getParsedBody();
+        try {
+            if (!$this->hasWriteRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
 
-        $data['jobId'] = Uuid::uuid4()->toString();
-        $data['success'] = $data['processed'] = false;
+            $data = $this->getRequest()->getParsedBody();
 
-        $holdRequest = new HoldRequest($data);
+            $data['jobId'] = Uuid::uuid4()->toString();
+            $data['success'] = $data['processed'] = false;
 
-        $holdRequest->create();
+            $holdRequest = new HoldRequest($data);
 
-        return $this->getResponse()->withJson(
-            new HoldRequestResponse($holdRequest)
-        );
+            $holdRequest->create();
+
+            return $this->getResponse()->withJson(
+                new HoldRequestResponse($holdRequest)
+            );
+        } catch(\Exception $e) {
+            throw new APIException(
+                'An error occurred',
+                $e->getMessage(),
+                $e->getCode()
+            );
+        }
     }
 
     /**
      * @SWG\Get(
-     *     path="/v0.2/hold-requests",
+     *     path="/v0.1/hold-requests",
      *     summary="Get a list of hold requests",
-     *     tags={"hold-requests"},
+     *     tags={"holds-service"},
      *     operationId="getHoldRequests",
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -113,12 +129,12 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
@@ -126,21 +142,36 @@ class HoldRequestController extends ServiceController
      *         }
      *     }
      * )
+     *
+     * @return Response
+     * @throws APIException
      */
     public function getHoldRequests()
     {
-        return  $this->getDefaultReadResponse(
-            new HoldRequest(),
-            new HoldRequestResponse(),
-            new Filter('patron', 'processed', 'record')
-        );
+        try {
+            if (!$this->hasReadRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
+
+            return  $this->getDefaultReadResponse(
+                new HoldRequest(),
+                new HoldRequestResponse(),
+                new Filter('patron', 'processed', 'record')
+            );
+        } catch(\Exception $e) {
+            throw new APIException(
+                'An error occurred',
+                $e->getMessage(),
+                $e->getCode()
+            );
+        }
     }
 
     /**
      * @SWG\Get(
-     *     path="/v0.2/hold-requests/{id}",
+     *     path="/v0.1/hold-requests/{id}",
      *     summary="Get a single hold request",
-     *     tags={"hold-requests"},
+     *     tags={"holds-service"},
      *     operationId="getHoldRequest",
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -165,12 +196,12 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
@@ -184,21 +215,34 @@ class HoldRequestController extends ServiceController
      * @param array $args
      *
      * @return Response
+     * @throws APIException
      */
     public function getHoldRequest(Request $request, Response $response, array $args)
     {
-        return  $this->getDefaultReadResponse(
-            new HoldRequest(),
-            new HoldRequestResponse(),
-            new Filter(null, null, false, $args['id'])
-        );
+        try {
+            if (!$this->hasReadRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
+
+            return  $this->getDefaultReadResponse(
+                new HoldRequest(),
+                new HoldRequestResponse(),
+                new Filter(null, null, false, $args['id'])
+            );
+        } catch(\Exception $e) {
+            throw new APIException(
+                'An error occurred',
+                $e->getMessage(),
+                $e->getCode()
+            );
+        }
     }
 
     /**
      * @SWG\Put(
-     *     path="/v0.2/hold-requests/{id}",
+     *     path="/v0.1/hold-requests/{id}",
      *     summary="Update a hold request",
-     *     tags={"hold-requests"},
+     *     tags={"holds-service"},
      *     operationId="updateHoldRequest",
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -224,12 +268,12 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
@@ -243,19 +287,32 @@ class HoldRequestController extends ServiceController
      * @param array $args
      *
      * @return Response
+     * @throws APIException
      */
     public function updateHoldRequest(Request $request, Response $response, array $args)
     {
-        $holdRequest = new HoldRequest();
+        try {
+            if (!$this->hasWriteRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
 
-        $holdRequest->addFilter(new Filter('id', $args['id']));
+            $holdRequest = new HoldRequest();
 
-        $holdRequest->update(
-            $this->getRequest()->getParsedBody()
-        );
+            $holdRequest->addFilter(new Filter('id', $args['id']));
 
-        return $this->getResponse()->withJson(
-            new HoldRequestResponse($holdRequest)
-        );
+            $holdRequest->update(
+                $this->getRequest()->getParsedBody()
+            );
+
+            return $this->getResponse()->withJson(
+                new HoldRequestResponse($holdRequest)
+            );
+        } catch(\Exception $e) {
+            throw new APIException(
+                'An error occurred',
+                $e->getMessage(),
+                $e->getCode()
+            );
+        }
     }
 }

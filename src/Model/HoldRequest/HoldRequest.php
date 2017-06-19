@@ -14,7 +14,7 @@ use NYPL\Starter\Model\ModelTrait\DBUpdateTrait;
  *
  * @package NYPL\Services\Model\HoldRequest
  */
-class HoldRequest extends HoldRequestModel implements MessageInterface, ReadInterface
+class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterface
 {
     use DBCreateTrait, DBReadTrait, DBUpdateTrait;
 

@@ -1,9 +1,7 @@
 <?php
 namespace NYPL\Services\Model\HoldRequest;
 
-use NYPL\Services\Model\ElectronicDocumentData;
 use NYPL\Services\Model\HoldRequestModel;
-use NYPL\Starter\APIException;
 use NYPL\Starter\APILogger;
 use NYPL\Starter\Model\ModelTrait\TranslateTrait;
 
@@ -68,7 +66,7 @@ class NewHoldRequest extends HoldRequestModel
             $this->requestType = $requestType;
         } else {
             $this->requestType = 'hold';
-            APILogger::addInfo('Invalid request type {type} sent. Default set to "hold."', ['type' => $requestType]);
+            APILogger::addInfo('Invalid request type {type} received. Reset to default "hold."', ['type' => $requestType]);
         }
     }
 }
