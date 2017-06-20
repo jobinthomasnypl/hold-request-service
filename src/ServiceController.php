@@ -1,7 +1,6 @@
 <?php
 namespace NYPL\Services;
 
-use NYPL\Starter\Config;
 use NYPL\Starter\Controller;
 use Slim\Container;
 
@@ -16,11 +15,6 @@ class ServiceController extends Controller
      * @var Container
      */
     public $container;
-
-    /**
-     * @var bool
-     */
-    public $useJobManager;
 
     /**
      * Controller constructor.
@@ -39,8 +33,6 @@ class ServiceController extends Controller
 
         $this->initializeIdentityHeader();
 
-        $this->setUseJobManager(Config::get('USE_JOB_MANAGER'));
-
         parent::__construct($this->request, $this->response, $cacheSeconds);
     }
 
@@ -58,21 +50,5 @@ class ServiceController extends Controller
     public function setContainer($container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUseJobManager()
-    {
-        return $this->useJobManager;
-    }
-
-    /**
-     * @param mixed $useJobManager
-     */
-    public function setUseJobManager($useJobManager)
-    {
-        $this->useJobManager = $useJobManager;
     }
 }

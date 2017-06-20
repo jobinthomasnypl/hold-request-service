@@ -61,7 +61,7 @@ class HoldRequestController extends ServiceController
     {
         $data = $this->getRequest()->getParsedBody();
 
-        $data['jobId'] = JobService::generateJobId($this->useJobManager);
+        $data['jobId'] = JobService::generateJobId();
         $data['success'] = $data['processed'] = false;
 
         $holdRequest = new HoldRequest($data);
