@@ -20,7 +20,7 @@ class NewHoldRequestTest extends TestCase
     }
 
     /**
-     * @covers NewHoldRequest
+     * @covers \NYPL\Services\Model\HoldRequest\NewHoldRequest
      */
     public function testAlwaysReturnsValidRequestType()
     {

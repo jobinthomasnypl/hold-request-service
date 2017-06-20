@@ -30,7 +30,7 @@ class JobServiceTest extends TestCase
     }
 
     /**
-     * @covers JobService
+     * @covers \NYPL\Services\JobService
      */
     public function testIfJobIdIsUnique()
     {
@@ -41,7 +41,7 @@ class JobServiceTest extends TestCase
     }
 
     /**
-     * @covers JobService
+     * @covers \NYPL\Services\JobService
      */
     public function testIfJobIdIsValidUuid()
     {
