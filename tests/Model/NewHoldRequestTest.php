@@ -19,6 +19,9 @@ class NewHoldRequestTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @covers NewHoldRequest
+     */
     public function testAlwaysReturnsValidRequestType()
     {
         $this->assertEquals('hold', $this->fakeHoldRequest->requestType);

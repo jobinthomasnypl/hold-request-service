@@ -14,23 +14,40 @@ class JobServiceTest extends TestCase
     {
         $this->fakeJobService = new class extends JobService {
 
-        public static $jobId = null;
+            public static function generateJobId($useJobManager = true): string
+            {
+                if ($useJobManager) {
+                    $serviceId = (string) uniqid();
+                } else {
+                    $serviceId = Uuid::uuid4();
+                }
+
+                return $serviceId;
+            }
 
         };
         parent::setUp();
     }
 
-    public function testifJobIdIsUnique()
+    /**
+     * @covers JobService
+     */
+    public function testIfJobIdIsUnique()
     {
-        $uniqueId = uniqid();
+        $fakeService = $this->fakeJobService;
+        $uniqueId = $fakeService::generateJobId();
 
         self::assertNotNull($uniqueId);
     }
 
+    /**
+     * @covers JobService
+     */
     public function testIfJobIdIsValidUuid()
     {
         $useJobManager = false;
-        $uuid = JobService::generateJobId($useJobManager);
+        $fakeService = $this->fakeJobService;
+        $uuid = $fakeService::generateJobId($useJobManager);
 
         self::assertTrue(Uuid::isValid($uuid));
     }
