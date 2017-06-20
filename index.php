@@ -18,15 +18,15 @@ try {
 
     $service->get('/docs', Swagger::class);
 
-    $service->post('/api/v0.2/hold-requests', HoldRequestController::class . ':createHoldRequest');
+    $service->post('/api/v0.1/hold-requests', HoldRequestController::class . ':createHoldRequest');
 
-    $service->get('/api/v0.2/hold-requests', HoldRequestController::class . ':getHoldRequests');
+    $service->get('/api/v0.1/hold-requests', HoldRequestController::class . ':getHoldRequests');
 
-    $service->get('/api/v0.2/hold-requests/{id}', HoldRequestController::class . ':getHoldRequest');
+    $service->get('/api/v0.1/hold-requests/{id}', HoldRequestController::class . ':getHoldRequest');
 
-    $service->put('/api/v0.2/hold-requests/{id}', HoldRequestController::class . ':updateHoldRequest');
+    $service->put('/api/v0.1/hold-requests/{id}', HoldRequestController::class . ':updateHoldRequest');
 
-    $service->post('/api/v0.2/hold-requests/{id}/result', HoldRequestResultController::class . ':processResult');
+    $service->post('/api/v0.1/hold-requests/{id}/result', HoldRequestResultController::class . ':processResult');
 
     $service->run();
 } catch (\Exception $exception) {

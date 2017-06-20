@@ -1,4 +1,5 @@
 <?php
+namespace NYPL\Serices\Test;
 
 use NYPL\Services\Model\HoldRequest\NewHoldRequest;
 use PHPUnit\Framework\TestCase;
