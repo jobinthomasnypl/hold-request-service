@@ -6,6 +6,7 @@ use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\Response\HoldRequestResponse;
+use NYPL\Starter\APIException;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
@@ -69,12 +70,12 @@ class HoldRequestController extends ServiceController
                 return $this->invalidScopeResponse();
             }
 
-        $data['jobId'] = JobService::generateJobId();
-        $data['success'] = $data['processed'] = false;
+            $data = $this->getRequest()->getParsedBody();
 
-        $holdRequest = new HoldRequest($data);
+            $data['jobId'] = JobService::generateJobId();
+            $data['success'] = $data['processed'] = false;
 
-        $holdRequest->create();
+            $holdRequest = new HoldRequest($data);
 
             $holdRequest->create();
 
@@ -152,9 +153,10 @@ class HoldRequestController extends ServiceController
             }
 
             return  $this->getDefaultReadResponse(
-                new HoldRequest(),
-                new HoldRequestResponse(),
-                new Filter('patron', 'processed', 'record')
+                new ModelSet(new HoldRequest()),
+                new HoldRequestsResponse(),
+                null,
+                ['patron', 'processed', 'record']
             );
         } catch(\Exception $exception) {
             throw new APIException(
