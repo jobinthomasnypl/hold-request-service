@@ -1,5 +1,5 @@
 <?php
-namespace NYPL\Services\Model;
+namespace NYPL\Services\Model\Response;
 
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Starter\Model\Response\SuccessResponse;

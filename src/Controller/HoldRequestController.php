@@ -1,12 +1,13 @@
 <?php
 namespace NYPL\Services\Controller;
 
+use NYPL\Services\JobService;
+use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
-use NYPL\Services\Model\HoldRequestResponse;
-use NYPL\Starter\APIException;
+use NYPL\Services\Model\Response\HoldRequestResponse;
 use NYPL\Starter\Filter;
-use Ramsey\Uuid\Uuid;
+use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -21,14 +22,14 @@ class HoldRequestController extends ServiceController
      * @SWG\Post(
      *     path="/v0.1/hold-requests",
      *     summary="Create new hold request",
-     *     tags={"holds-service"},
+     *     tags={"hold-requests"},
      *     operationId="createHoldRequest",
      *     consumes={"application/json"},
      *     produces={"application/json"},
      *     @SWG\Parameter(
      *         name="NewHoldRequest",
      *         in="body",
-     *         description="",
+     *         description="Request object based on the included data model",
      *         required=true,
      *         @SWG\Schema(ref="#/definitions/NewHoldRequest")
      *     ),
@@ -68,12 +69,12 @@ class HoldRequestController extends ServiceController
                 return $this->invalidScopeResponse();
             }
 
-            $data = $this->getRequest()->getParsedBody();
+        $data['jobId'] = JobService::generateJobId();
+        $data['success'] = $data['processed'] = false;
 
-            $data['jobId'] = Uuid::uuid4()->toString();
-            $data['success'] = $data['processed'] = false;
+        $holdRequest = new HoldRequest($data);
 
-            $holdRequest = new HoldRequest($data);
+        $holdRequest->create();
 
             $holdRequest->create();
 
@@ -93,7 +94,7 @@ class HoldRequestController extends ServiceController
      * @SWG\Get(
      *     path="/v0.1/hold-requests",
      *     summary="Get a list of hold requests",
-     *     tags={"holds-service"},
+     *     tags={"hold-requests"},
      *     operationId="getHoldRequests",
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -101,30 +102,27 @@ class HoldRequestController extends ServiceController
      *         name="patron",
      *         in="query",
      *         required=false,
-     *         type="string"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="record",
-     *         in="query",
-     *         required=false,
-     *         type="string"
+     *         type="string",
+     *         description="ID of patron provided by ILS"
      *     ),
      *     @SWG\Parameter(
      *         name="processed",
      *         in="query",
      *         required=false,
      *         type="boolean"
+     *         description="Processed status flag"
      *     ),
      *     @SWG\Parameter(
-     *         name="nyplSource",
+     *         name="record",
      *         in="query",
      *         required=false,
      *         type="string"
+     *         description="ID of record provided by ILS"
      *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="Successful operation",
-     *         @SWG\Schema(ref="#/definitions/HoldRequestResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestsResponse")
      *     ),
      *     @SWG\Response(
      *         response="404",
@@ -171,7 +169,7 @@ class HoldRequestController extends ServiceController
      * @SWG\Get(
      *     path="/v0.1/hold-requests/{id}",
      *     summary="Get a single hold request",
-     *     tags={"holds-service"},
+     *     tags={"hold-requests"},
      *     operationId="getHoldRequest",
      *     consumes={"application/json"},
      *     produces={"application/json"},
@@ -180,13 +178,8 @@ class HoldRequestController extends ServiceController
      *         in="path",
      *         required=true,
      *         type="string",
-     *         format="string"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="nyplSource",
-     *         in="path",
-     *         required=true,
-     *         type="string"
+     *         format="string",
+     *         description="ID of hold request"
      *     ),
      *     @SWG\Response(
      *         response=200,
@@ -242,12 +235,12 @@ class HoldRequestController extends ServiceController
      * @SWG\Put(
      *     path="/v0.1/hold-requests/{id}",
      *     summary="Update a hold request",
-     *     tags={"holds-service"},
+     *     tags={"hold-requests"},
      *     operationId="updateHoldRequest",
      *     consumes={"application/json"},
      *     produces={"application/json"},
      *     @SWG\Parameter(
-     *         description="ID of Hold Request",
+     *         description="ID of hold request",
      *         in="path",
      *         name="id",
      *         required=true,
