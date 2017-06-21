@@ -80,11 +80,11 @@ class HoldRequestController extends ServiceController
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
-        } catch(\Exception $e) {
+        } catch(\Exception $exception) {
             throw new APIException(
                 'An error occurred',
-                $e->getMessage(),
-                $e->getCode()
+                $exception->getMessage(),
+                $exception->getCode()
             );
         }
     }
@@ -158,11 +158,11 @@ class HoldRequestController extends ServiceController
                 new HoldRequestResponse(),
                 new Filter('patron', 'processed', 'record')
             );
-        } catch(\Exception $e) {
+        } catch(\Exception $exception) {
             throw new APIException(
                 'An error occurred',
-                $e->getMessage(),
-                $e->getCode()
+                $exception->getMessage(),
+                $exception->getCode()
             );
         }
     }
@@ -229,11 +229,11 @@ class HoldRequestController extends ServiceController
                 new HoldRequestResponse(),
                 new Filter(null, null, false, $args['id'])
             );
-        } catch(\Exception $e) {
+        } catch(\Exception $exception) {
             throw new APIException(
                 'An error occurred',
-                $e->getMessage(),
-                $e->getCode()
+                $exception->getMessage(),
+                $exception->getCode()
             );
         }
     }
@@ -307,11 +307,11 @@ class HoldRequestController extends ServiceController
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
-        } catch(\Exception $e) {
+        } catch(\Exception $exception) {
             throw new APIException(
                 'An error occurred',
-                $e->getMessage(),
-                $e->getCode()
+                $exception->getMessage(),
+                $exception->getCode()
             );
         }
     }

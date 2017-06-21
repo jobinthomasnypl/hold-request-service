@@ -1,7 +1,7 @@
 <?php
 namespace NYPL\Services;
 
-use NYPL\Services\Model\HoldRequestErrorResponse;
+use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Starter\Controller;
 use Slim\Container;
 
@@ -61,17 +61,17 @@ class ServiceController extends Controller
 
     public function hasReadRequestScope()
     {
-        return in_array(self::READ_REQUEST_SCOPE, $this->identityHeader->getScopes()) || $this->hasGlobalRequestScope();
+        return in_array(self::READ_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes()) || $this->hasGlobalRequestScope();
     }
 
     public function hasWriteRequestScope()
     {
-        return in_array(self::WRITE_REQUEST_SCOPE, $this->identityHeader->getScopes()) || $this->hasGlobalRequestScope();
+        return in_array(self::WRITE_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes()) || $this->hasGlobalRequestScope();
     }
 
     protected function hasGlobalRequestScope()
     {
-        return in_array(self::GLOBAL_REQUEST_SCOPE, $this->identityHeader->getScopes());
+        return in_array(self::GLOBAL_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes());
     }
 
     /**
