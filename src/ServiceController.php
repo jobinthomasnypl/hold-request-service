@@ -17,11 +17,6 @@ class ServiceController extends Controller
     public $container;
 
     /**
-     * @var array
-     */
-    public $parameters;
-
-    /**
      * Controller constructor.
      *
      * @param \Slim\Container $container

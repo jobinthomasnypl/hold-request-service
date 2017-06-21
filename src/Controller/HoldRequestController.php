@@ -1,11 +1,11 @@
 <?php
 namespace NYPL\Services\Controller;
 
+use NYPL\Services\JobService;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\HoldRequestResponse;
 use NYPL\Starter\Filter;
-use Ramsey\Uuid\Uuid;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -18,7 +18,7 @@ class HoldRequestController extends ServiceController
 {
     /**
      * @SWG\Post(
-     *     path="/v0.2/hold-requests",
+     *     path="/v0.1/hold-requests",
      *     summary="Create new hold request",
      *     tags={"hold-requests"},
      *     operationId="createHoldRequest",
@@ -61,7 +61,7 @@ class HoldRequestController extends ServiceController
     {
         $data = $this->getRequest()->getParsedBody();
 
-        $data['jobId'] = Uuid::uuid4()->toString();
+        $data['jobId'] = JobService::generateJobId();
         $data['success'] = $data['processed'] = false;
 
         $holdRequest = new HoldRequest($data);
@@ -75,7 +75,7 @@ class HoldRequestController extends ServiceController
 
     /**
      * @SWG\Get(
-     *     path="/v0.2/hold-requests",
+     *     path="/v0.1/hold-requests",
      *     summary="Get a list of hold requests",
      *     tags={"hold-requests"},
      *     operationId="getHoldRequests",
@@ -138,7 +138,7 @@ class HoldRequestController extends ServiceController
 
     /**
      * @SWG\Get(
-     *     path="/v0.2/hold-requests/{id}",
+     *     path="/v0.1/hold-requests/{id}",
      *     summary="Get a single hold request",
      *     tags={"hold-requests"},
      *     operationId="getHoldRequest",
@@ -196,7 +196,7 @@ class HoldRequestController extends ServiceController
 
     /**
      * @SWG\Put(
-     *     path="/v0.2/hold-requests/{id}",
+     *     path="/v0.1/hold-requests/{id}",
      *     summary="Update a hold request",
      *     tags={"hold-requests"},
      *     operationId="updateHoldRequest",

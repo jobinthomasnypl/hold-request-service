@@ -1,4 +1,5 @@
 <?php
+namespace NYPL\Serices\Test;
 
 use NYPL\Services\Model\HoldRequest\NewHoldRequest;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,9 @@ class NewHoldRequestTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @covers \NYPL\Services\Model\HoldRequest\NewHoldRequest
+     */
     public function testAlwaysReturnsValidRequestType()
     {
         $this->assertEquals('hold', $this->fakeHoldRequest->requestType);
