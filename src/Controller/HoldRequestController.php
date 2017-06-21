@@ -2,10 +2,12 @@
 namespace NYPL\Services\Controller;
 
 use NYPL\Services\JobService;
+use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
-use NYPL\Services\Model\HoldRequestResponse;
+use NYPL\Services\Model\Response\HoldRequestResponse;
 use NYPL\Starter\Filter;
+use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -27,7 +29,7 @@ class HoldRequestController extends ServiceController
      *     @SWG\Parameter(
      *         name="NewHoldRequest",
      *         in="body",
-     *         description="",
+     *         description="Request object based on the included data model",
      *         required=true,
      *         @SWG\Schema(ref="#/definitions/NewHoldRequest")
      *     ),
@@ -85,30 +87,27 @@ class HoldRequestController extends ServiceController
      *         name="patron",
      *         in="query",
      *         required=false,
-     *         type="string"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="record",
-     *         in="query",
-     *         required=false,
-     *         type="string"
+     *         type="string",
+     *         description="ID of patron provided by ILS"
      *     ),
      *     @SWG\Parameter(
      *         name="processed",
      *         in="query",
      *         required=false,
      *         type="boolean"
+     *         description="Processed status flag"
      *     ),
      *     @SWG\Parameter(
-     *         name="nyplSource",
+     *         name="record",
      *         in="query",
      *         required=false,
      *         type="string"
+     *         description="ID of record provided by ILS"
      *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="Successful operation",
-     *         @SWG\Schema(ref="#/definitions/HoldRequestResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestsResponse")
      *     ),
      *     @SWG\Response(
      *         response="404",
@@ -130,9 +129,10 @@ class HoldRequestController extends ServiceController
     public function getHoldRequests()
     {
         return  $this->getDefaultReadResponse(
-            new HoldRequest(),
-            new HoldRequestResponse(),
-            new Filter('patron', 'processed', 'record')
+            new ModelSet(new HoldRequest()),
+            new HoldRequestsResponse(),
+            null,
+            ['patron', 'processed', 'record']
         );
     }
 
@@ -149,13 +149,8 @@ class HoldRequestController extends ServiceController
      *         in="path",
      *         required=true,
      *         type="string",
-     *         format="string"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="nyplSource",
-     *         in="path",
-     *         required=true,
-     *         type="string"
+     *         format="string",
+     *         description="ID of hold request"
      *     ),
      *     @SWG\Response(
      *         response=200,
@@ -203,7 +198,7 @@ class HoldRequestController extends ServiceController
      *     consumes={"application/json"},
      *     produces={"application/json"},
      *     @SWG\Parameter(
-     *         description="ID of Hold Request",
+     *         description="ID of hold request",
      *         in="path",
      *         name="id",
      *         required=true,
