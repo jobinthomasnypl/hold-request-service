@@ -1,5 +1,5 @@
 <?php
-namespace NYPL\Serices\Test;
+namespace NYPL\Services\Test;
 
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ class HoldRequestTest extends TestCase
     }
 
     /**
-     * @covers \NYPL\Services\Model\HoldRequest\NewHoldRequest
+     * @covers NYPL\Services\Model\HoldRequest\NewHoldRequest
      */
     public function testAlwaysReturnsValidRequestType()
     {
