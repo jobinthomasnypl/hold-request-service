@@ -82,7 +82,6 @@ Homebrew is highly recommended for PHP:
   * `brew install php71`
   * `brew install php71-pdo-pgsql`
   
-
 ## Installation
 
 1. Clone the repo.
@@ -93,6 +92,11 @@ Homebrew is highly recommended for PHP:
 3. Setup [configuration](#configuration) files.
    * Copy the `.env.sample` file to `.env`.
    * Copy `config/var_qa.env.sample` to `config/var_qa.env` and `config/var_production.env.sample` to `config/var_production.env`.
+
+## Security
+
+Authorization provided via OAuth2 authorization_code. Set scopes in the format of access_type:service.
+For example, read:holds to access the GET request method endpoints.
 
 ## Configuration
 
