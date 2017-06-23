@@ -1,6 +1,7 @@
 <?php
 namespace NYPL\Services;
 
+use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Starter\Controller;
 use Slim\Container;
 
@@ -11,6 +12,12 @@ use Slim\Container;
  */
 class ServiceController extends Controller
 {
+    const READ_REQUEST_SCOPE = 'read:hold_requests';
+
+    const WRITE_REQUEST_SCOPE = 'write:hold_requests';
+
+    const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_requests';
+
     /**
      * @var Container
      */
@@ -50,5 +57,34 @@ class ServiceController extends Controller
     public function setContainer($container)
     {
         $this->container = $container;
+    }
+
+    public function hasReadRequestScope()
+    {
+        return in_array(self::READ_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes()) || $this->hasGlobalRequestScope();
+    }
+
+    public function hasWriteRequestScope()
+    {
+        return in_array(self::WRITE_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes()) || $this->hasGlobalRequestScope();
+    }
+
+    protected function hasGlobalRequestScope()
+    {
+        return in_array(self::GLOBAL_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes());
+    }
+
+    /**
+     * @return \Slim\Http\Response
+     */
+    public function invalidScopeResponse()
+    {
+        return $this->getResponse()->withJson(
+            new HoldRequestErrorResponse(
+                '403',
+                'invalid-scope',
+                'Client does not have sufficient privileges.'
+            )
+        );
     }
 }

@@ -6,6 +6,7 @@ use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\Response\HoldRequestResponse;
+use NYPL\Starter\APIException;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
@@ -45,34 +46,49 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api"}
+     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
      *         }
      *     }
      * )
+     *
+     * @return Response
+     * @throws APIException
      */
     public function createHoldRequest()
     {
-        $data = $this->getRequest()->getParsedBody();
+        try {
+            if (!$this->hasWriteRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
 
-        $data['jobId'] = JobService::generateJobId();
-        $data['success'] = $data['processed'] = false;
+            $data = $this->getRequest()->getParsedBody();
 
-        $holdRequest = new HoldRequest($data);
+            $data['jobId'] = JobService::generateJobId();
+            $data['success'] = $data['processed'] = false;
 
-        $holdRequest->create();
+            $holdRequest = new HoldRequest($data);
 
-        return $this->getResponse()->withJson(
-            new HoldRequestResponse($holdRequest)
-        );
+            $holdRequest->create();
+
+            return $this->getResponse()->withJson(
+                new HoldRequestResponse($holdRequest)
+            );
+        } catch(\Exception $exception) {
+            throw new APIException(
+                'An error occurred',
+                $exception->getMessage(),
+                $exception->getCode()
+            );
+        }
     }
 
     /**
@@ -112,28 +128,43 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api"}
+     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
      *         }
      *     }
      * )
+     *
+     * @return Response
+     * @throws APIException
      */
     public function getHoldRequests()
     {
-        return  $this->getDefaultReadResponse(
-            new ModelSet(new HoldRequest()),
-            new HoldRequestsResponse(),
-            null,
-            ['patron', 'processed', 'record']
-        );
+        try {
+            if (!$this->hasReadRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
+
+            return  $this->getDefaultReadResponse(
+                new ModelSet(new HoldRequest()),
+                new HoldRequestsResponse(),
+                null,
+                ['patron', 'processed', 'record']
+            );
+        } catch(\Exception $exception) {
+            throw new APIException(
+                'An error occurred',
+                $exception->getMessage(),
+                $exception->getCode()
+            );
+        }
     }
 
     /**
@@ -160,16 +191,16 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api"}
+     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
      *         }
      *     }
      * )
@@ -179,14 +210,27 @@ class HoldRequestController extends ServiceController
      * @param array $args
      *
      * @return Response
+     * @throws APIException
      */
     public function getHoldRequest(Request $request, Response $response, array $args)
     {
-        return  $this->getDefaultReadResponse(
-            new HoldRequest(),
-            new HoldRequestResponse(),
-            new Filter(null, null, false, $args['id'])
-        );
+        try {
+            if (!$this->hasReadRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
+
+            return  $this->getDefaultReadResponse(
+                new HoldRequest(),
+                new HoldRequestResponse(),
+                new Filter(null, null, false, $args['id'])
+            );
+        } catch(\Exception $exception) {
+            throw new APIException(
+                'An error occurred',
+                $exception->getMessage(),
+                $exception->getCode()
+            );
+        }
     }
 
     /**
@@ -219,16 +263,16 @@ class HoldRequestController extends ServiceController
      *     @SWG\Response(
      *         response="404",
      *         description="Not found",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     @SWG\Response(
      *         response="500",
      *         description="Generic server error",
-     *         @SWG\Schema(ref="#/definitions/ErrorResponse")
+     *         @SWG\Schema(ref="#/definitions/HoldRequestErrorResponse")
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api"}
+     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
      *         }
      *     }
      * )
@@ -238,19 +282,32 @@ class HoldRequestController extends ServiceController
      * @param array $args
      *
      * @return Response
+     * @throws APIException
      */
     public function updateHoldRequest(Request $request, Response $response, array $args)
     {
-        $holdRequest = new HoldRequest();
+        try {
+            if (!$this->hasWriteRequestScope()) {
+                return $this->invalidScopeResponse();
+            }
 
-        $holdRequest->addFilter(new Filter('id', $args['id']));
+            $holdRequest = new HoldRequest();
 
-        $holdRequest->update(
-            $this->getRequest()->getParsedBody()
-        );
+            $holdRequest->addFilter(new Filter('id', $args['id']));
 
-        return $this->getResponse()->withJson(
-            new HoldRequestResponse($holdRequest)
-        );
+            $holdRequest->update(
+                $this->getRequest()->getParsedBody()
+            );
+
+            return $this->getResponse()->withJson(
+                new HoldRequestResponse($holdRequest)
+            );
+        } catch(\Exception $exception) {
+            throw new APIException(
+                'An error occurred',
+                $exception->getMessage(),
+                $exception->getCode()
+            );
+        }
     }
 }

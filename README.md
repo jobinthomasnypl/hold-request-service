@@ -82,7 +82,6 @@ Homebrew is highly recommended for PHP:
   * `brew install php71`
   * `brew install php71-pdo-pgsql`
   
-
 ## Installation
 
 1. Clone the repo.
@@ -93,6 +92,11 @@ Homebrew is highly recommended for PHP:
 3. Setup [configuration](#configuration) files.
    * Copy the `.env.sample` file to `.env`.
    * Copy `config/var_qa.env.sample` to `config/var_qa.env` and `config/var_production.env.sample` to `config/var_production.env`.
+
+## Security
+
+Authorization provided via OAuth2 authorization_code. Set scopes in the format of access_type:service.
+For example, read:holds to access the GET request method endpoints.
 
 ## Configuration
 
@@ -150,12 +154,12 @@ To use the PHP internal web server, run:
 php -S localhost:8888 -t . index.php
 ~~~~
 
-You can then make a request to the Lambda: `http://localhost:8888/api/v0.1/bibs`.
+You can then make a request to the Lambda: `http://localhost:8888/api/v0.1/hold-requests`.
 
 ### Swagger Documentation Generator
 
 Create a Swagger route to generate Swagger specification documentation:
 
 ~~~~
-$service->get("/swagger", SwaggerGenerator::class);
+$service->get("/docs", SwaggerGenerator::class);
 ~~~~
