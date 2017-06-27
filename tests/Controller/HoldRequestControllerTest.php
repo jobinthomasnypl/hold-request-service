@@ -3,11 +3,9 @@ namespace NYPL\Services\Test;
 
 use NYPL\Services\Controller\HoldRequestController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
-use NYPL\Services\Model\HoldRequest\NewHoldRequest;
+use NYPL\Services\Test\Mocks\MockConfig;
 use NYPL\Services\Test\Mocks\MockService;
 use NYPL\Services\Test\Stubs\MockAvroModel;
-use NYPL\Starter\AvroLoader;
-use NYPL\Starter\Config;
 use PHPUnit\Framework\TestCase;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -19,7 +17,7 @@ class HoldRequestControllerTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        Config::initialize(__DIR__ . '/../../');
+        MockConfig::initialize(__DIR__ . '/../../');
         MockService::setMockContainer();
         $this->mockContainer = MockService::getMockContainer();
 
