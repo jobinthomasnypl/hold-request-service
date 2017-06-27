@@ -1,5 +1,5 @@
 <?php
-namespace NYPL\Services\Test;
+namespace NYPL\Services\Test\Controller;
 
 use NYPL\Services\Controller\HoldRequestController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
