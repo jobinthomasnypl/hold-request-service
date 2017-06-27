@@ -30,7 +30,7 @@ class JobServiceTest extends TestCase
     }
 
     /**
-     * @covers \NYPL\Services\JobService
+     * @covers NYPL\Services\JobService::generateJobId
      */
     public function testIfJobIdIsUnique()
     {
@@ -41,7 +41,7 @@ class JobServiceTest extends TestCase
     }
 
     /**
-     * @covers NYPL\Services\JobService
+     * @covers NYPL\Services\JobService::generateJobId
      */
     public function testIfJobIdIsValidUuid()
     {
