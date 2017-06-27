@@ -3,6 +3,7 @@ namespace NYPL\Services\Test;
 
 use NYPL\Services\Controller\HoldRequestController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
+use NYPL\Services\Model\HoldRequest\NewHoldRequest;
 use NYPL\Services\Test\Mocks\MockService;
 use NYPL\Services\Test\Stubs\MockAvroModel;
 use NYPL\Starter\AvroLoader;
@@ -195,10 +196,9 @@ class HoldRequestControllerTest extends TestCase
             'CONTENT_TYPE' => 'application/json;charset=utf8',
         ];
 
-        $data = '{"patron": "300135","nyplSource": "recap-cul","requestType": "hold","recordType": "i","record": "32312222x","pickupLocation": "sasb","neededBy": "2016-01-07T02:32:51Z","numberOfCopies": "1","docDeliveryData": {}}';
+        $data = '{"id": 43,"jobId": "113159483425338de","createdDate": "2017-06-19T16:29:25-04:00","updatedDate": null,"success": false,"processed": false,"deliveryLocation": null,"patron": "300135","nyplSource": "recap-cul","requestType": "hold","recordType": "i","record": "32312222x","pickupLocation": "sasb","neededBy": "2016-01-07T02:32:51Z","numberOfCopies": "1","docDeliveryData": {}}';
         $avro = new MockAvroModel(new HoldRequest(), $data);
         $modelJson = json_encode($avro->modelAsArray());
-        print_r($modelJson);
 
         $controller = $this->fakeHoldRequestController;
 

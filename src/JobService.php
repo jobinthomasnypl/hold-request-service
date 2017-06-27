@@ -23,7 +23,7 @@ class JobService
      * @throws \NYPL\Starter\APIException
      * @return string
      */
-    public static function generateJobId(bool $useJobManager = true): string
+    public static function generateJobId($useJobManager = true): string
     {
         if ($useJobManager) {
             try {

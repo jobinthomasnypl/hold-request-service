@@ -1,0 +1,28 @@
+{
+  "data":
+    {
+      "id": 43,
+      "jobId": "113159483425338de",
+      "createdDate": "2017-06-19T16:29:25-04:00",
+      "updatedDate": null,
+      "success": false,
+      "processed": false,
+      "deliveryLocation": null,
+      "patron": "67793666",
+      "nyplSource": "sierra-nypl",
+      "requestType": "hold",
+      "recordType": "i",
+      "record": "32312222x",
+      "pickupLocation": "sasb",
+      "neededBy": "2016-01-07T02:32:51+00:00",
+      "numberOfCopies": 1,
+      "docDeliveryData": {
+        "emailAddress": null,
+        "chapterTitle": null,
+        "startPage": null,
+        "endPage": null,
+        "issue": null,
+        "volume": null
+      }
+    }
+}
