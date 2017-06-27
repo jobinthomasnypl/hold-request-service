@@ -70,7 +70,7 @@ class HoldRequestControllerTest extends TestCase
                 return $response;
             }
 
-            public function updateHoldRequest()
+            public function updateHoldRequest(Request $request, Response $response, array $args)
             {
                 $response = new Response();
                 $stubResponse = preg_replace(
@@ -98,7 +98,7 @@ class HoldRequestControllerTest extends TestCase
     {
         $controller = $this->fakeHoldRequestController;
 
-        $response = $controller->createHoldRequests();
+        $response = $controller->createHoldRequest();
 
         $requestData = '{
             "data": {
@@ -250,7 +250,11 @@ class HoldRequestControllerTest extends TestCase
     {
         $controller = $this->fakeHoldRequestController;
 
-        $response = $controller->updateHoldRequests();
+        $response = $controller->updateHoldRequest(
+            $this->mockContainer['request'],
+            $this->mockContainer['response'],
+            []
+        );
 
         $requestData = '{
             "data": {
