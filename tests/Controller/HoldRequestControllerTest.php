@@ -31,7 +31,7 @@ class HoldRequestControllerTest extends TestCase
                 parent::__construct($container, $cacheSeconds);
             }
 
-            public function createHoldRequests()
+            public function createHoldRequest()
             {
                 $response = new Response();
                 $stubResponse = preg_replace(
@@ -70,7 +70,7 @@ class HoldRequestControllerTest extends TestCase
                 return $response;
             }
 
-            public function updateHoldRequests()
+            public function updateHoldRequest()
             {
                 $response = new Response();
                 $stubResponse = preg_replace(
@@ -92,7 +92,7 @@ class HoldRequestControllerTest extends TestCase
     }
 
     /**
-     * @covers NYPL\Services\Controller\HoldRequestController::createHoldRequests
+     * @covers HoldRequestController::createHoldRequest
      */
     public function testCreationOfHoldRequest()
     {
@@ -244,7 +244,7 @@ class HoldRequestControllerTest extends TestCase
 
 
     /**
-     * @covers NYPL\Services\Controller\HoldRequestController::updateHoldRequests
+     * @covers NYPL\Services\Controller\HoldRequestController::updateHoldRequest
      */
     public function testUpdatingAHoldRequest()
     {
