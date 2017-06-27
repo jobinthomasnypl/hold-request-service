@@ -59,19 +59,30 @@ class ServiceController extends Controller
         $this->container = $container;
     }
 
-    public function hasReadRequestScope()
+    /**
+     * @return bool
+     */
+    public function hasReadRequestScope(): bool
     {
-        return in_array(self::READ_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes()) || $this->hasGlobalRequestScope();
+        return (bool) in_array(self::READ_REQUEST_SCOPE, (array) $this->getIdentityHeader()->getScopes()) ||
+                        $this->hasGlobalRequestScope();
     }
 
-    public function hasWriteRequestScope()
+    /**
+     * @return bool
+     */
+    public function hasWriteRequestScope(): bool
     {
-        return in_array(self::WRITE_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes()) || $this->hasGlobalRequestScope();
+        return (bool) in_array(self::WRITE_REQUEST_SCOPE, (array) $this->getIdentityHeader()->getScopes()) ||
+                        $this->hasGlobalRequestScope();
     }
 
-    protected function hasGlobalRequestScope()
+    /**
+     * @return bool
+     */
+    protected function hasGlobalRequestScope(): bool
     {
-        return in_array(self::GLOBAL_REQUEST_SCOPE, $this->getIdentityHeader()->getScopes());
+        return (bool) in_array(self::GLOBAL_REQUEST_SCOPE, (array) $this->getIdentityHeader()->getScopes());
     }
 
     /**

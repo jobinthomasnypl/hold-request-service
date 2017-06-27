@@ -1,7 +1,7 @@
 <?php
 /**
  * @SWG\Swagger(
- *     schemes={"http", "https"},
+ *     schemes={"http","https"},
  *     host="apidocs.nypltech.org",
  *     basePath="/api",
  *     @SWG\Info(

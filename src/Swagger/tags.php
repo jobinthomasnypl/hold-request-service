@@ -2,7 +2,7 @@
 
 /**
  * @SWG\Tag(
- *   name="holds-beta",
- *   description="Hold Request Service API"
+ *   name="hold-requests",
+ *   description="Hold Request API"
  * )
  */

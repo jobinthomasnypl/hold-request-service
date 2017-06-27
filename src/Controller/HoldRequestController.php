@@ -7,6 +7,8 @@ use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\Response\HoldRequestResponse;
 use NYPL\Starter\APIException;
+use NYPL\Starter\APILogger;
+use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
@@ -67,12 +69,13 @@ class HoldRequestController extends ServiceController
     {
         try {
             if (!$this->hasWriteRequestScope()) {
+                APILogger::addInfo('Invalid scope received. Client not authorized to create hold requests.');
                 return $this->invalidScopeResponse();
             }
 
             $data = $this->getRequest()->getParsedBody();
 
-            $data['jobId'] = JobService::generateJobId();
+            $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
             $data['success'] = $data['processed'] = false;
 
             $holdRequest = new HoldRequest($data);
@@ -82,11 +85,13 @@ class HoldRequestController extends ServiceController
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             throw new APIException(
-                'An error occurred',
-                $exception->getMessage(),
-                $exception->getCode()
+                'An error occurred while creating a hold request. ' . $exception->getMessage(),
+                [],
+                $exception->getCode(),
+                $exception,
+                $this->getResponse()->getStatusCode()
             );
         }
     }
@@ -107,17 +112,10 @@ class HoldRequestController extends ServiceController
      *         description="ID of patron provided by ILS"
      *     ),
      *     @SWG\Parameter(
-     *         name="processed",
-     *         in="query",
-     *         required=false,
-     *         type="boolean"
-     *         description="Processed status flag"
-     *     ),
-     *     @SWG\Parameter(
      *         name="record",
      *         in="query",
      *         required=false,
-     *         type="string"
+     *         type="string",
      *         description="ID of record provided by ILS"
      *     ),
      *     @SWG\Response(
@@ -149,6 +147,7 @@ class HoldRequestController extends ServiceController
     {
         try {
             if (!$this->hasReadRequestScope()) {
+                APILogger::addInfo('Invalid scope received. Client not authorized to get bulk hold requests.');
                 return $this->invalidScopeResponse();
             }
 
@@ -156,13 +155,15 @@ class HoldRequestController extends ServiceController
                 new ModelSet(new HoldRequest()),
                 new HoldRequestsResponse(),
                 null,
-                ['patron', 'processed', 'record']
+                ['patron', 'record']
             );
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             throw new APIException(
-                'An error occurred',
-                $exception->getMessage(),
-                $exception->getCode()
+                'An error occurred while getting bulk hold requests. ' . $exception->getMessage(),
+                [],
+                $exception->getCode(),
+                $exception,
+                $this->getResponse()->getStatusCode()
             );
         }
     }
@@ -216,6 +217,7 @@ class HoldRequestController extends ServiceController
     {
         try {
             if (!$this->hasReadRequestScope()) {
+                APILogger::addInfo('Invalid scope received. Client not authorized to get single hold requests.');
                 return $this->invalidScopeResponse();
             }
 
@@ -224,11 +226,13 @@ class HoldRequestController extends ServiceController
                 new HoldRequestResponse(),
                 new Filter(null, null, false, $args['id'])
             );
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             throw new APIException(
-                'An error occurred',
-                $exception->getMessage(),
-                $exception->getCode()
+                'An error occurred while getting a single hold request. ' . $exception->getMessage(),
+                [],
+                $exception->getCode(),
+                $exception,
+                $this->getResponse()->getStatusCode()
             );
         }
     }
@@ -288,6 +292,7 @@ class HoldRequestController extends ServiceController
     {
         try {
             if (!$this->hasWriteRequestScope()) {
+                APILogger::addInfo('Invalid scope received. Client not authorized to update hold requests.');
                 return $this->invalidScopeResponse();
             }
 
@@ -302,11 +307,13 @@ class HoldRequestController extends ServiceController
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             throw new APIException(
-                'An error occurred',
-                $exception->getMessage(),
-                $exception->getCode()
+                'An error occurred while updating a hold request. ' . $exception->getMessage(),
+                [],
+                $exception->getCode(),
+                $exception,
+                $this->getResponse()->getStatusCode()
             );
         }
     }
