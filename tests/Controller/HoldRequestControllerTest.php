@@ -92,7 +92,7 @@ class HoldRequestControllerTest extends TestCase
     }
 
     /**
-     * @covers HoldRequestController::createHoldRequest
+     * @covers NYPL\Services\Controller\HoldRequestController::createHoldRequest
      */
     public function testCreationOfHoldRequest()
     {
