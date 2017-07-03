@@ -10,7 +10,7 @@
  *     "openid offline_access api": "General API access",
  *     "openid offline_access api patron:read": "Patron specific API access",
  *     "openid offline_access api staff:read": "Staff specific API access",
- *     "openid offline_access api readwrite:hold_requests": "Hold requests specific API access"
+ *     "openid offline_access api readwrite:hold_request": "Hold requests specific API access"
  *   }
  * )
  */

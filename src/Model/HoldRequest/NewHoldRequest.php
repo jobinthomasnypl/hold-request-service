@@ -17,38 +17,6 @@ class NewHoldRequest extends HoldRequestModel
     const VALID_REQUEST_TYPES = ['hold', 'edd'];
 
     /**
-     * @return array
-     */
-    public function getSchema()
-    {
-        return [
-            "name" => "NewHoldRequest",
-            "type" => "record",
-            "fields" => [
-                ["name" => "patron", "type" => "string"],
-                ["name" => "nyplSource", "type" => "string"],
-                ["name" => "requestType", "type" => "string"],
-                ["name" => "recordType", "type" => ["string", "null"]],
-                ["name" => "record", "type" => "string"],
-                ["name" => "pickupLocation", "type" => ["string", "null"]],
-                ["name" => "neededBy", "type" => ["string", "null"]],
-                ["name" => "numberOfCopies", "type" => ["int", "null"]],
-                ["name" => "docDeliveryData", "type" => [
-                    "null",
-                    ["name" => "docDeliveryData", "type" => "record", "fields" => [
-                        ["name" => "emailAddress", "type" => ["string", "null"]],
-                        ["name" => "chapterTitle", "type" => ["string", "null"]],
-                        ["name" => "volume", "type" => ["string", "null"]],
-                        ["name" => "issue", "type" => ["string", "null"]],
-                        ["name" => "startPage", "type" => "string"],
-                        ["name" => "endPage", "type" => "string"],
-                    ]]
-                ]],
-            ]
-        ];
-    }
-
-    /**
      * @param $requestType
      * @return bool
      */
@@ -66,7 +34,10 @@ class NewHoldRequest extends HoldRequestModel
             $this->requestType = $requestType;
         } else {
             $this->requestType = 'hold';
-            APILogger::addInfo('Invalid request type {type} received. Reset to default "hold."', ['type' => $requestType]);
+            APILogger::addInfo(
+                'Invalid request type {type} received. Reset to default "hold."',
+                ['type' => $requestType]
+            );
         }
     }
 }

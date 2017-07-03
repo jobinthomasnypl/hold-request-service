@@ -57,7 +57,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api write:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
@@ -135,7 +135,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api read:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
@@ -201,7 +201,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api read:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
@@ -276,7 +276,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api write:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
