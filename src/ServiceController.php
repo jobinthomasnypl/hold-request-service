@@ -12,11 +12,11 @@ use Slim\Container;
  */
 class ServiceController extends Controller
 {
-    const READ_REQUEST_SCOPE = 'read:hold_requests';
+    const READ_REQUEST_SCOPE = 'read:hold_request';
 
-    const WRITE_REQUEST_SCOPE = 'write:hold_requests';
+    const WRITE_REQUEST_SCOPE = 'write:hold_request';
 
-    const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_requests';
+    const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_request';
 
     /**
      * @var Container
@@ -96,6 +96,6 @@ class ServiceController extends Controller
                 'invalid-scope',
                 'Client does not have sufficient privileges.'
             )
-        );
+        )->withStatus(403);
     }
 }

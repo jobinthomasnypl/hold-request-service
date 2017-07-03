@@ -16,7 +16,7 @@ try {
 
     $service = new Service($container);
 
-    $service->get('/docs', Swagger::class);
+    $service->get('/docs/hold-requests', Swagger::class);
 
     $service->post('/api/v0.1/hold-requests', HoldRequestController::class . ':createHoldRequest');
 
@@ -24,9 +24,7 @@ try {
 
     $service->get('/api/v0.1/hold-requests/{id}', HoldRequestController::class . ':getHoldRequest');
 
-    $service->put('/api/v0.1/hold-requests/{id}', HoldRequestController::class . ':updateHoldRequest');
-
-    $service->post('/api/v0.1/hold-requests/{id}/result', HoldRequestResultController::class . ':processResult');
+    $service->patch('/api/v0.1/hold-requests/{id}', HoldRequestController::class . ':updateHoldRequest');
 
     $service->run();
 } catch (\Exception $exception) {

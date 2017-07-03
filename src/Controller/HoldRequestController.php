@@ -57,7 +57,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api"}
      *         }
      *     }
      * )
@@ -67,33 +67,18 @@ class HoldRequestController extends ServiceController
      */
     public function createHoldRequest()
     {
-        try {
-            if (!$this->hasWriteRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to create hold requests.');
-                return $this->invalidScopeResponse();
-            }
+        $data = $this->getRequest()->getParsedBody();
 
-            $data = $this->getRequest()->getParsedBody();
+        $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
+        $data['success'] = $data['processed'] = false;
 
-            $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
-            $data['success'] = $data['processed'] = false;
+        $holdRequest = new HoldRequest($data);
 
-            $holdRequest = new HoldRequest($data);
+        $holdRequest->create();
 
-            $holdRequest->create();
-
-            return $this->getResponse()->withJson(
-                new HoldRequestResponse($holdRequest)
-            );
-        } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while creating a hold request. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
-        }
+        return $this->getResponse()->withJson(
+            new HoldRequestResponse($holdRequest)
+        );
     }
 
     /**
@@ -135,7 +120,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api"}
      *         }
      *     }
      * )
@@ -145,27 +130,12 @@ class HoldRequestController extends ServiceController
      */
     public function getHoldRequests()
     {
-        try {
-            if (!$this->hasReadRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to get bulk hold requests.');
-                return $this->invalidScopeResponse();
-            }
-
-            return  $this->getDefaultReadResponse(
-                new ModelSet(new HoldRequest()),
-                new HoldRequestsResponse(),
-                null,
-                ['patron', 'record']
-            );
-        } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while getting bulk hold requests. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
-        }
+        return  $this->getDefaultReadResponse(
+            new ModelSet(new HoldRequest()),
+            new HoldRequestsResponse(),
+            null,
+            ['patron', 'record']
+        );
     }
 
     /**
@@ -201,7 +171,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api"}
      *         }
      *     }
      * )
@@ -215,30 +185,15 @@ class HoldRequestController extends ServiceController
      */
     public function getHoldRequest(Request $request, Response $response, array $args)
     {
-        try {
-            if (!$this->hasReadRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to get single hold requests.');
-                return $this->invalidScopeResponse();
-            }
-
-            return  $this->getDefaultReadResponse(
-                new HoldRequest(),
-                new HoldRequestResponse(),
-                new Filter(null, null, false, $args['id'])
-            );
-        } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while getting a single hold request. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
-        }
+        return  $this->getDefaultReadResponse(
+            new HoldRequest(),
+            new HoldRequestResponse(),
+            new Filter(null, null, false, $args['id'])
+        );
     }
 
     /**
-     * @SWG\Put(
+     * @SWG\Patch(
      *     path="/v0.1/hold-requests/{id}",
      *     summary="Update a hold request",
      *     tags={"hold-requests"},
@@ -276,7 +231,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api"}
      *         }
      *     }
      * )
@@ -290,31 +245,16 @@ class HoldRequestController extends ServiceController
      */
     public function updateHoldRequest(Request $request, Response $response, array $args)
     {
-        try {
-            if (!$this->hasWriteRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to update hold requests.');
-                return $this->invalidScopeResponse();
-            }
+        $holdRequest = new HoldRequest();
 
-            $holdRequest = new HoldRequest();
+        $holdRequest->addFilter(new Filter('id', $args['id']));
 
-            $holdRequest->addFilter(new Filter('id', $args['id']));
+        $holdRequest->update(
+            $this->getRequest()->getParsedBody()
+        );
 
-            $holdRequest->update(
-                $this->getRequest()->getParsedBody()
-            );
-
-            return $this->getResponse()->withJson(
-                new HoldRequestResponse($holdRequest)
-            );
-        } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while updating a hold request. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
-        }
+        return $this->getResponse()->withJson(
+            new HoldRequestResponse($holdRequest)
+        );
     }
 }
