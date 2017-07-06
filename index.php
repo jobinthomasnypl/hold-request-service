@@ -5,7 +5,6 @@ use NYPL\Starter\Service;
 use NYPL\Starter\Config;
 use NYPL\Starter\ErrorHandler;
 use NYPL\Services\Controller\HoldRequestController;
-use NYPL\Services\Controller\HoldRequestResultController;
 
 require __DIR__ . '/vendor/autoload.php';
 

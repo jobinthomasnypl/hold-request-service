@@ -14,7 +14,7 @@ class JobServiceTest extends TestCase
     {
         $this->fakeJobService = new class extends JobService {
 
-            public static function generateJobId($useJobManager = true): string
+            public static function generateJobId(bool $useJobManager = true): string
             {
                 if ($useJobManager) {
                     $serviceId = (string) uniqid();

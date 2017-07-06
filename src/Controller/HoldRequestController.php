@@ -2,12 +2,12 @@
 namespace NYPL\Services\Controller;
 
 use NYPL\Services\JobService;
+use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\Response\HoldRequestResponse;
 use NYPL\Starter\APIException;
-use NYPL\Starter\APILogger;
 use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
@@ -68,6 +68,17 @@ class HoldRequestController extends ServiceController
     public function createHoldRequest()
     {
         $data = $this->getRequest()->getParsedBody();
+
+        if (strtolower($data['requestType']) === 'edd' && !$data['docDeliveryData']) {
+            return $this->getResponse()->withJson(
+                new HoldRequestErrorResponse(
+                    500,
+                    'invalid-edd',
+                    'EDD request is missing all details.',
+                    new APIException('An error occurred', $data)
+                )
+            )->withStatus(500);
+        }
 
         $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
         $data['success'] = $data['processed'] = false;

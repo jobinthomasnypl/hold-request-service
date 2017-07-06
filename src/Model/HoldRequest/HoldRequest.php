@@ -31,13 +31,13 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public $jobId;
 
     /**
-     * @SWG\Property(example="2016-01-07T02:32:51Z", type="string")
+     * @SWG\Property(example="2017-07-03T02:32:51Z", type="string")
      * @var LocalDateTime
      */
     public $createdDate;
 
     /**
-     * @SWG\Property(example="2016-01-07T02:32:51Z", type="string")
+     * @SWG\Property(example="2017-07-03T02:32:51Z", type="string")
      * @var LocalDateTime
      */
     public $updatedDate;
@@ -77,22 +77,23 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
                 ["name" => "updatedDate", "type" => ["null", "string"]],
                 ["name" => "success", "type" => "boolean"],
                 ["name" => "processed", "type" => "boolean"],
-                ["name" => "requestType", "type" => "string"],
+                ["name" => "requestType", "type" => ["null", "string"]],
                 ["name" => "recordType", "type" => "string"],
                 ["name" => "record", "type" => "string"],
                 ["name" => "pickupLocation", "type" => ["null", "string"]],
                 ["name" => "neededBy", "type" => ["null", "string"]],
                 ["name" => "numberOfCopies", "type" => ["null", "int"]],
                 ["name" => "deliveryLocation", "type" => ["null", "string"]],
-                ["name" => "docDeliveryData", "default", null, "type" => [
+                ["name" => "docDeliveryData", "default" => null, "type" => [
                     "null",
                     ["name" => "docDeliveryData", "type" => "record", "fields" => [
-                        ["name" => "emailAddress", "type" => ["null", "string"]],
-                        ["name" => "chapterTitle", "type" => ["null", "string"]],
+                        ["name" => "emailAddress", "type" =>  "string"],
+                        ["name" => "chapterTitle", "type" => "string"],
+                        ["name" => "startPage", "type" => "string"],
+                        ["name" => "endPage", "type" => "string"],
                         ["name" => "volume", "type" => ["null", "string"]],
                         ["name" => "issue", "type" => ["null", "string"]],
-                        ["name" => "startPage", "type" => ["null", "string"]],
-                        ["name" => "endPage", "type" => ["null", "string"]],
+                        ["name" => "requestNotes", "type" => ["null", "string"]],
                     ]]
                 ]],
             ]

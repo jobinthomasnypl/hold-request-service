@@ -17,7 +17,7 @@ class NewHoldRequest extends HoldRequestModel
     const VALID_REQUEST_TYPES = ['hold', 'edd'];
 
     /**
-     * @param $requestType
+     * @param null|string $requestType
      * @return bool
      */
     protected function isValidRequestType($requestType)
@@ -26,7 +26,7 @@ class NewHoldRequest extends HoldRequestModel
     }
 
     /**
-     * @param string $requestType
+     * @param null|string $requestType
      */
     public function setRequestType($requestType)
     {

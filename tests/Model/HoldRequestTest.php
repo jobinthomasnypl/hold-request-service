@@ -11,7 +11,7 @@ class HoldRequestTest extends TestCase
     public function setUp()
     {
         $this->fakeHoldRequest = new class extends HoldRequest {
-            public function __construct($data = ['requestType' => 'retrieval'])
+            public function __construct($data = ['requestType' => null])
             {
                 parent::__construct($data);
             }
@@ -24,8 +24,8 @@ class HoldRequestTest extends TestCase
      */
     public function testAlwaysReturnsValidRequestType()
     {
-        $this->assertEquals('hold', $this->fakeHoldRequest->requestType);
+        $this->assertEquals('hold', $this->fakeHoldRequest->getRequestType());
         $this->fakeHoldRequest->setRequestType('edd');
-        $this->assertEquals('edd', $this->fakeHoldRequest->requestType);
+        $this->assertEquals('edd', $this->fakeHoldRequest->getRequestType());
     }
 }

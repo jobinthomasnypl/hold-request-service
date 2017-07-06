@@ -15,22 +15,22 @@ abstract class HoldRequestModel extends Model
     use TranslateTrait;
 
     /**
-     * @SWG\Property(example="1838982")
+     * @SWG\Property(example="6779366")
      * @var string
      */
     public $patron;
 
     /**
-     * @SWG\Property(example="recap-nypl")
+     * @SWG\Property(example="sierra-nypl")
      * @var string
      */
     public $nyplSource;
 
     /**
-     * @SWG\Property(example="item")
+     * @SWG\Property(example="hold")
      * @var string
      */
-    public $requestType;
+    public $requestType = 'hold';
 
     /**
      * @SWG\Property(example="i")
@@ -39,19 +39,19 @@ abstract class HoldRequestModel extends Model
     public $recordType;
 
     /**
-     * @SWG\Property(example="17388176")
+     * @SWG\Property(example="10011085")
      * @var string
      */
     public $record;
 
     /**
-     * @SWG\Property(example="sasb")
+     * @SWG\Property(example="mal")
      * @var string
      */
     public $pickupLocation;
 
     /**
-     * @SWG\Property(example="2016-01-07T02:32:51Z", type="string")
+     * @SWG\Property(example="2018-01-07T02:32:51Z", type="string")
      * @var LocalDateTime
      */
     public $neededBy;
