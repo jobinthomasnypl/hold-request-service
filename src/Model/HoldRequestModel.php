@@ -51,6 +51,12 @@ abstract class HoldRequestModel extends Model
     public $pickupLocation;
 
     /**
+     * @SWG\Property(example="NW")
+     * @var string
+     */
+    public $deliveryLocation;
+
+    /**
      * @SWG\Property(example="2018-01-07T02:32:51Z", type="string")
      * @var LocalDateTime
      */
@@ -162,6 +168,22 @@ abstract class HoldRequestModel extends Model
     public function setPickupLocation(string $pickupLocation)
     {
         $this->pickupLocation = $pickupLocation;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeliveryLocation()
+    {
+        return $this->deliveryLocation;
+    }
+
+    /**
+     * @param string $deliveryLocation
+     */
+    public function setDeliveryLocation(string $deliveryLocation)
+    {
+        $this->deliveryLocation = $deliveryLocation;
     }
 
     /**

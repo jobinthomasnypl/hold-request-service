@@ -55,12 +55,6 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public $processed;
 
     /**
-     * @SWG\Property(example="NW")
-     * @var string
-     */
-    public $deliveryLocation;
-
-    /**
      * Returns a valid Avro 1.8.1 schema structure.
      *
      * @return array
@@ -233,21 +227,5 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public function setProcessed(bool $processed)
     {
         $this->processed = $processed;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeliveryLocation()
-    {
-        return $this->deliveryLocation;
-    }
-
-    /**
-     * @param string $deliveryLocation
-     */
-    public function setDeliveryLocation(string $deliveryLocation)
-    {
-        $this->deliveryLocation = $deliveryLocation;
     }
 }
