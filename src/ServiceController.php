@@ -12,11 +12,11 @@ use Slim\Container;
  */
 class ServiceController extends Controller
 {
-    const READ_REQUEST_SCOPE = 'read:hold_requests';
+    const READ_REQUEST_SCOPE = 'read:hold_request';
 
-    const WRITE_REQUEST_SCOPE = 'write:hold_requests';
+    const WRITE_REQUEST_SCOPE = 'write:hold_request';
 
-    const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_requests';
+    const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_request';
 
     /**
      * @var Container
@@ -29,7 +29,7 @@ class ServiceController extends Controller
      * @param \Slim\Container $container
      * @param int $cacheSeconds
      */
-    public function __construct(Container $container, $cacheSeconds = 0)
+    public function __construct(Container $container, int $cacheSeconds = 0)
     {
         $this->setResponse($container->get('response'));
         $this->setRequest($container->get('request'));
@@ -54,7 +54,7 @@ class ServiceController extends Controller
     /**
      * @param Container $container
      */
-    public function setContainer($container)
+    public function setContainer(Container $container)
     {
         $this->container = $container;
     }
@@ -64,8 +64,11 @@ class ServiceController extends Controller
      */
     public function hasReadRequestScope(): bool
     {
-        return (bool) in_array(self::READ_REQUEST_SCOPE, (array) $this->getIdentityHeader()->getScopes()) ||
-                        $this->hasGlobalRequestScope();
+        return (bool) in_array(
+            self::READ_REQUEST_SCOPE,
+            (array) $this->getIdentityHeader()->getScopes()
+        )
+        || $this->hasGlobalRequestScope();
     }
 
     /**
@@ -73,8 +76,11 @@ class ServiceController extends Controller
      */
     public function hasWriteRequestScope(): bool
     {
-        return (bool) in_array(self::WRITE_REQUEST_SCOPE, (array) $this->getIdentityHeader()->getScopes()) ||
-                        $this->hasGlobalRequestScope();
+        return (bool) in_array(
+            self::WRITE_REQUEST_SCOPE,
+            (array) $this->getIdentityHeader()->getScopes()
+        )
+        || $this->hasGlobalRequestScope();
     }
 
     /**
@@ -82,7 +88,10 @@ class ServiceController extends Controller
      */
     protected function hasGlobalRequestScope(): bool
     {
-        return (bool) in_array(self::GLOBAL_REQUEST_SCOPE, (array) $this->getIdentityHeader()->getScopes());
+        return (bool) in_array(
+            self::GLOBAL_REQUEST_SCOPE,
+            (array) $this->getIdentityHeader()->getScopes()
+        );
     }
 
     /**
@@ -96,6 +105,6 @@ class ServiceController extends Controller
                 'invalid-scope',
                 'Client does not have sufficient privileges.'
             )
-        );
+        )->withStatus(403);
     }
 }

@@ -15,22 +15,22 @@ abstract class HoldRequestModel extends Model
     use TranslateTrait;
 
     /**
-     * @SWG\Property(example="1838982")
+     * @SWG\Property(example="6779366")
      * @var string
      */
     public $patron;
 
     /**
-     * @SWG\Property(example="recap-nypl")
+     * @SWG\Property(example="sierra-nypl")
      * @var string
      */
     public $nyplSource;
 
     /**
-     * @SWG\Property(example="item")
+     * @SWG\Property(example="hold")
      * @var string
      */
-    public $requestType;
+    public $requestType = 'hold';
 
     /**
      * @SWG\Property(example="i")
@@ -39,19 +39,19 @@ abstract class HoldRequestModel extends Model
     public $recordType;
 
     /**
-     * @SWG\Property(example="17388176")
+     * @SWG\Property(example="10011630")
      * @var string
      */
     public $record;
 
     /**
-     * @SWG\Property(example="sasb")
+     * @SWG\Property(example="mal")
      * @var string
      */
     public $pickupLocation;
 
     /**
-     * @SWG\Property(example="2016-01-07T02:32:51Z", type="string")
+     * @SWG\Property(example="2018-01-07T02:32:51Z", type="string")
      * @var LocalDateTime
      */
     public $neededBy;
@@ -79,7 +79,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $patron
      */
-    public function setPatron($patron)
+    public function setPatron(string $patron)
     {
         $this->patron = $patron;
     }
@@ -95,7 +95,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $nyplSource
      */
-    public function setNyplSource($nyplSource)
+    public function setNyplSource(string $nyplSource)
     {
         $this->nyplSource = $nyplSource;
     }
@@ -111,7 +111,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $requestType
      */
-    public function setRequestType($requestType)
+    public function setRequestType(string $requestType)
     {
         $this->requestType = $requestType;
     }
@@ -127,7 +127,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $recordType
      */
-    public function setRecordType($recordType)
+    public function setRecordType(string $recordType)
     {
         $this->recordType = $recordType;
     }
@@ -143,7 +143,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $record
      */
-    public function setRecord($record)
+    public function setRecord(string $record)
     {
         $this->record = $record;
     }
@@ -159,7 +159,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $pickupLocation
      */
-    public function setPickupLocation($pickupLocation)
+    public function setPickupLocation(string $pickupLocation)
     {
         $this->pickupLocation = $pickupLocation;
     }
@@ -175,7 +175,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param LocalDateTime $neededBy
      */
-    public function setNeededBy($neededBy)
+    public function setNeededBy(LocalDateTime $neededBy)
     {
         $this->neededBy = $neededBy;
     }
@@ -185,7 +185,7 @@ abstract class HoldRequestModel extends Model
      *
      * @return LocalDateTime
      */
-    public function translateNeededBy($neededBy = '')
+    public function translateNeededBy(string $neededBy = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $neededBy);
     }
@@ -201,7 +201,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $numberOfCopies
      */
-    public function setNumberOfCopies($numberOfCopies)
+    public function setNumberOfCopies(string $numberOfCopies)
     {
         $this->numberOfCopies = (int) $numberOfCopies;
     }
@@ -227,7 +227,7 @@ abstract class HoldRequestModel extends Model
      *
      * @return ElectronicDocumentData
      */
-    public function translateDocDeliveryData($data)
+    public function translateDocDeliveryData(array $data)
     {
         return new ElectronicDocumentData($data, true);
     }

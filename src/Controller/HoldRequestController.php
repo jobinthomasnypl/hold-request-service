@@ -2,10 +2,11 @@
 namespace NYPL\Services\Controller;
 
 use NYPL\Services\JobService;
-use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\Response\HoldRequestResponse;
+use NYPL\Services\Model\Response\HoldRequestErrorResponse;
+use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Starter\APIException;
 use NYPL\Starter\APILogger;
 use NYPL\Starter\Config;
@@ -57,7 +58,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api write:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
@@ -74,6 +75,17 @@ class HoldRequestController extends ServiceController
             }
 
             $data = $this->getRequest()->getParsedBody();
+
+            if (strtolower($data['requestType']) === 'edd' && !$data['docDeliveryData']) {
+                return $this->getResponse()->withJson(
+                    new HoldRequestErrorResponse(
+                        500,
+                        'invalid-hold_request',
+                        'EDD request is missing all details.',
+                        new APIException('An error occurred', $data)
+                    )
+                )->withStatus(500);
+            }
 
             $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
             $data['success'] = $data['processed'] = false;
@@ -135,7 +147,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api read:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
@@ -201,7 +213,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api read:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api read:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
@@ -238,7 +250,7 @@ class HoldRequestController extends ServiceController
     }
 
     /**
-     * @SWG\Put(
+     * @SWG\Patch(
      *     path="/v0.1/hold-requests/{id}",
      *     summary="Update a hold request",
      *     tags={"hold-requests"},
@@ -276,7 +288,7 @@ class HoldRequestController extends ServiceController
      *     ),
      *     security={
      *         {
-     *             "api_auth": {"openid offline_access api write:hold_requests readwrite:hold_requests"}
+     *             "api_auth": {"openid offline_access api write:hold_request readwrite:hold_request"}
      *         }
      *     }
      * )
