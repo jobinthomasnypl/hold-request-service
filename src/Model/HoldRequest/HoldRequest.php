@@ -61,7 +61,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public $deliveryLocation;
 
     /**
-     * Returns an Avro 1.8.1 schema which should be valid.
+     * Returns a valid Avro 1.8.1 schema structure.
      *
      * @return array
      */

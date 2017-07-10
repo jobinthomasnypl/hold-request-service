@@ -223,11 +223,11 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @param array $data
+     * @param array|string $data
      *
      * @return ElectronicDocumentData
      */
-    public function translateDocDeliveryData(array $data)
+    public function translateDocDeliveryData($data)
     {
         return new ElectronicDocumentData($data, true);
     }

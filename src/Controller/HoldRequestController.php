@@ -94,6 +94,8 @@ class HoldRequestController extends ServiceController
 
             $holdRequest->create();
 
+            APILogger::addInfo('Hold request initiated.');
+
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
@@ -315,6 +317,8 @@ class HoldRequestController extends ServiceController
             $holdRequest->update(
                 $this->getRequest()->getParsedBody()
             );
+
+            APILogger::addInfo('Hold request update initiated.');
 
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
