@@ -1,6 +1,7 @@
 <?php
 namespace NYPL\Services;
 
+use Firebase\JWT\JWT;
 use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Starter\Controller;
 use Slim\Container;
@@ -59,6 +60,32 @@ class ServiceController extends Controller
         $this->container = $container;
     }
 
+    public function patronIsAuthorized()
+    {
+        $requestIdentity = $this->getPatronFromRequest();
+        $tokenIdentity = $this->getPatronFromToken();
+
+        return strcmp($requestIdentity, $tokenIdentity) === 0;
+    }
+
+    protected function hasPatronIdentifier()
+    {
+        $params = $this->getRequest()->getQueryParams();
+
+        return isset($params['patron']);
+    }
+
+    public function isRequestAuthorized()
+    {
+        if ($this->getRequest()->getMethod() === 'GET') {
+            $hasScopeAccess = $this->hasReadRequestScope();
+        } else {
+            $hasScopeAccess = $this->hasWriteRequestScope();
+        }
+
+        return $hasScopeAccess || $this->patronIsAuthorized();
+    }
+
     /**
      * @return bool
      */
@@ -94,6 +121,25 @@ class ServiceController extends Controller
         );
     }
 
+    protected function getPatronFromRequest()
+    {
+        $payload = json_decode($this->getRequest()->getBody());
+        return $payload->patron;
+    }
+
+    protected function getPublicKey()
+    {
+        return file_get_contents(__DIR__ . '/../config/pubkey.pem');
+    }
+
+    protected function getPatronFromToken()
+    {
+        $token = $this->getIdentityHeader()->getToken();
+        $decoded = JWT::decode($token, $this->getPublicKey(), array('RS256'));
+
+        return $decoded->sub;
+    }
+
     /**
      * @return \Slim\Http\Response
      */
@@ -103,6 +149,20 @@ class ServiceController extends Controller
             new HoldRequestErrorResponse(
                 '403',
                 'invalid-scope',
+                'Client does not have sufficient privileges.'
+            )
+        )->withStatus(403);
+    }
+
+    /**
+     * @return \Slim\Http\Response
+     */
+    public function invalidRequestResponse()
+    {
+        return $this->getResponse()->withJson(
+            new HoldRequestErrorResponse(
+                '403',
+                'invalid-request',
                 'Client does not have sufficient privileges.'
             )
         )->withStatus(403);

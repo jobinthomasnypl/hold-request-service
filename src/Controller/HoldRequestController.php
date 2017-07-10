@@ -69,9 +69,9 @@ class HoldRequestController extends ServiceController
     public function createHoldRequest()
     {
         try {
-            if (!$this->hasWriteRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to create hold requests.');
-                return $this->invalidScopeResponse();
+            if (!$this->isRequestAuthorized()) {
+                APILogger::addError('Invalid request received. Client not authorized to get bulk hold requests.');
+                return $this->invalidRequestResponse();
             }
 
             $data = $this->getRequest()->getParsedBody();
@@ -160,7 +160,7 @@ class HoldRequestController extends ServiceController
         try {
             if (!$this->hasReadRequestScope()) {
                 APILogger::addInfo('Invalid scope received. Client not authorized to get bulk hold requests.');
-                return $this->invalidScopeResponse();
+                return $this->invalidRequestResponse();
             }
 
             return  $this->getDefaultReadResponse(
@@ -303,9 +303,9 @@ class HoldRequestController extends ServiceController
     public function updateHoldRequest(Request $request, Response $response, array $args)
     {
         try {
-            if (!$this->hasWriteRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to update hold requests.');
-                return $this->invalidScopeResponse();
+            if (!$this->isRequestAuthorized()) {
+                APILogger::addError('Invalid request received. Client not authorized to get bulk hold requests.');
+                return $this->invalidRequestResponse();
             }
 
             $holdRequest = new HoldRequest();
