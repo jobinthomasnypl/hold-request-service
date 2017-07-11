@@ -31,13 +31,13 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public $jobId;
 
     /**
-     * @SWG\Property(example="2017-07-03T02:32:51Z", type="string")
+     * @SWG\Property(example="2018-01-07T02:32:51Z", type="string")
      * @var LocalDateTime
      */
     public $createdDate;
 
     /**
-     * @SWG\Property(example="2017-07-03T02:32:51Z", type="string")
+     * @SWG\Property(example="2018-01-07T02:32:51Z", type="string")
      * @var LocalDateTime
      */
     public $updatedDate;
@@ -55,12 +55,8 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public $processed;
 
     /**
-     * @SWG\Property(example="NW")
-     * @var string
-     */
-    public $deliveryLocation;
-
-    /**
+     * Returns a valid Avro 1.8.1 schema structure.
+     *
      * @return array
      */
     public function getSchema()
@@ -87,10 +83,11 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
                 ["name" => "docDeliveryData", "default" => null, "type" => [
                     "null",
                     ["name" => "docDeliveryData", "type" => "record", "fields" => [
-                        ["name" => "emailAddress", "type" =>  "string"],
+                        ["name" => "emailAddress", "type" => "string"],
                         ["name" => "chapterTitle", "type" => "string"],
                         ["name" => "startPage", "type" => "string"],
                         ["name" => "endPage", "type" => "string"],
+                        ["name" => "author", "type" => ["null", "string"]],
                         ["name" => "volume", "type" => ["null", "string"]],
                         ["name" => "issue", "type" => ["null", "string"]],
                         ["name" => "requestNotes", "type" => ["null", "string"]],
@@ -117,7 +114,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     }
 
     /**
-     * @param $id
+     * @param int|string $id
      */
     public function setId($id)
     {
@@ -141,9 +138,9 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     }
 
     /**
-     * @param $jobId
+     * @param string $jobId
      */
-    public function setJobId($jobId)
+    public function setJobId(string $jobId)
     {
         $this->jobId = $jobId;
     }
@@ -159,7 +156,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param LocalDateTime $createdDate
      */
-    public function setCreatedDate($createdDate)
+    public function setCreatedDate(LocalDateTime $createdDate)
     {
         $this->createdDate = $createdDate;
     }
@@ -169,7 +166,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      *
      * @return LocalDateTime
      */
-    public function translateCreatedDate($createdDate = '')
+    public function translateCreatedDate(string $createdDate = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $createdDate);
     }
@@ -185,7 +182,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param LocalDateTime $updatedDate
      */
-    public function setUpdatedDate($updatedDate)
+    public function setUpdatedDate(LocalDateTime $updatedDate)
     {
         $this->updatedDate = $updatedDate;
     }
@@ -195,7 +192,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      *
      * @return LocalDateTime
      */
-    public function translateUpdatedDate($updatedDate = '')
+    public function translateUpdatedDate(string $updatedDate = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $updatedDate);
     }
@@ -211,9 +208,9 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param boolean $success
      */
-    public function setSuccess($success)
+    public function setSuccess(bool $success)
     {
-        $this->success = boolval($success);
+        $this->success = $success;
     }
 
     /**
@@ -227,24 +224,8 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param boolean $processed
      */
-    public function setProcessed($processed)
+    public function setProcessed(bool $processed)
     {
-        $this->processed = boolval($processed);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeliveryLocation()
-    {
-        return $this->deliveryLocation;
-    }
-
-    /**
-     * @param string $deliveryLocation
-     */
-    public function setDeliveryLocation($deliveryLocation)
-    {
-        $this->deliveryLocation = $deliveryLocation;
+        $this->processed = $processed;
     }
 }

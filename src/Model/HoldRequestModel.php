@@ -39,7 +39,7 @@ abstract class HoldRequestModel extends Model
     public $recordType;
 
     /**
-     * @SWG\Property(example="10011085")
+     * @SWG\Property(example="10011630")
      * @var string
      */
     public $record;
@@ -49,6 +49,12 @@ abstract class HoldRequestModel extends Model
      * @var string
      */
     public $pickupLocation;
+
+    /**
+     * @SWG\Property(example="NW")
+     * @var string
+     */
+    public $deliveryLocation;
 
     /**
      * @SWG\Property(example="2018-01-07T02:32:51Z", type="string")
@@ -79,7 +85,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $patron
      */
-    public function setPatron($patron)
+    public function setPatron(string $patron)
     {
         $this->patron = $patron;
     }
@@ -95,7 +101,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $nyplSource
      */
-    public function setNyplSource($nyplSource)
+    public function setNyplSource(string $nyplSource)
     {
         $this->nyplSource = $nyplSource;
     }
@@ -111,7 +117,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $requestType
      */
-    public function setRequestType($requestType)
+    public function setRequestType(string $requestType)
     {
         $this->requestType = $requestType;
     }
@@ -127,7 +133,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $recordType
      */
-    public function setRecordType($recordType)
+    public function setRecordType(string $recordType)
     {
         $this->recordType = $recordType;
     }
@@ -143,7 +149,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $record
      */
-    public function setRecord($record)
+    public function setRecord(string $record)
     {
         $this->record = $record;
     }
@@ -159,9 +165,25 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $pickupLocation
      */
-    public function setPickupLocation($pickupLocation)
+    public function setPickupLocation(string $pickupLocation)
     {
         $this->pickupLocation = $pickupLocation;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeliveryLocation()
+    {
+        return $this->deliveryLocation;
+    }
+
+    /**
+     * @param string $deliveryLocation
+     */
+    public function setDeliveryLocation(string $deliveryLocation)
+    {
+        $this->deliveryLocation = $deliveryLocation;
     }
 
     /**
@@ -175,7 +197,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param LocalDateTime $neededBy
      */
-    public function setNeededBy($neededBy)
+    public function setNeededBy(LocalDateTime $neededBy)
     {
         $this->neededBy = $neededBy;
     }
@@ -185,7 +207,7 @@ abstract class HoldRequestModel extends Model
      *
      * @return LocalDateTime
      */
-    public function translateNeededBy($neededBy = '')
+    public function translateNeededBy(string $neededBy = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $neededBy);
     }
@@ -201,7 +223,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $numberOfCopies
      */
-    public function setNumberOfCopies($numberOfCopies)
+    public function setNumberOfCopies(string $numberOfCopies)
     {
         $this->numberOfCopies = (int) $numberOfCopies;
     }
@@ -223,7 +245,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @param array $data
+     * @param array|string $data
      *
      * @return ElectronicDocumentData
      */

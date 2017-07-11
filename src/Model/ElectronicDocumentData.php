@@ -38,6 +38,12 @@ class ElectronicDocumentData extends Model
     public $endPage;
 
     /**
+     * @SWG\Property(example="Anonymous")
+     * @var string
+     */
+    public $author;
+
+    /**
      * @SWG\Property(example="Summer 2017")
      * @var string
      */
@@ -50,6 +56,12 @@ class ElectronicDocumentData extends Model
     public $volume;
 
     /**
+     * @SWG\Property(example="Backup physical delivery requested.")
+     * @var string
+     */
+    public $requestNotes;
+
+    /**
      * @return string
      */
     public function getEmailAddress()
@@ -60,7 +72,7 @@ class ElectronicDocumentData extends Model
     /**
      * @param string $emailAddress
      */
-    public function setEmailAddress($emailAddress)
+    public function setEmailAddress(string $emailAddress)
     {
         $this->emailAddress = $emailAddress;
     }
@@ -76,9 +88,25 @@ class ElectronicDocumentData extends Model
     /**
      * @param string $chapterTitle
      */
-    public function setChapterTitle($chapterTitle)
+    public function setChapterTitle(string $chapterTitle)
     {
         $this->chapterTitle = $chapterTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * @param string $author
+     */
+    public function setAuthor(string $author)
+    {
+        $this->author = $author;
     }
 
     /**
@@ -92,7 +120,7 @@ class ElectronicDocumentData extends Model
     /**
      * @param string $startPage
      */
-    public function setStartPage($startPage)
+    public function setStartPage(string $startPage)
     {
         $this->startPage = $startPage;
     }
@@ -108,7 +136,7 @@ class ElectronicDocumentData extends Model
     /**
      * @param string $endPage
      */
-    public function setEndPage($endPage)
+    public function setEndPage(string $endPage)
     {
         $this->endPage = $endPage;
     }
@@ -124,7 +152,7 @@ class ElectronicDocumentData extends Model
     /**
      * @param string $issue
      */
-    public function setIssue($issue)
+    public function setIssue(string $issue)
     {
         $this->issue = $issue;
     }
@@ -140,8 +168,24 @@ class ElectronicDocumentData extends Model
     /**
      * @param string $volume
      */
-    public function setVolume($volume)
+    public function setVolume(string $volume)
     {
         $this->volume = $volume;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestNotes(): string
+    {
+        return $this->requestNotes;
+    }
+
+    /**
+     * @param string $requestNotes
+     */
+    public function setRequestNotes(string $requestNotes)
+    {
+        $this->requestNotes = $requestNotes;
     }
 }

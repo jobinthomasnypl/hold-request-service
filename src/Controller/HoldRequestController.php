@@ -2,11 +2,11 @@
 namespace NYPL\Services\Controller;
 
 use NYPL\Services\JobService;
-use NYPL\Services\Model\Response\HoldRequestErrorResponse;
-use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
 use NYPL\Services\Model\Response\HoldRequestResponse;
+use NYPL\Services\Model\Response\HoldRequestErrorResponse;
+use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Starter\APIException;
 use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
