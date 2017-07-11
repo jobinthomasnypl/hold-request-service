@@ -68,6 +68,8 @@ class HoldRequestController extends ServiceController
      */
     public function createHoldRequest()
     {
+        APILogger::addInfo('Hold request initiated.');
+
         try {
             if (!$this->isRequestAuthorized()) {
                 APILogger::addError('Invalid request received. Client not authorized to get bulk hold requests.');
@@ -93,8 +95,6 @@ class HoldRequestController extends ServiceController
             $holdRequest = new HoldRequest($data);
 
             $holdRequest->create();
-
-            APILogger::addInfo('Hold request initiated.');
 
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
@@ -317,6 +317,11 @@ class HoldRequestController extends ServiceController
             $holdRequest->update(
                 $this->getRequest()->getParsedBody()
             );
+
+            $holdRequestJob = JobService::getJob();
+            if ($holdRequestJob->getStatusCode() === 200) {
+                JobService::updateJobStatus($holdRequest->isSuccess());
+            }
 
             APILogger::addInfo('Hold request update initiated.');
 
