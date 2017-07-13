@@ -3,6 +3,7 @@ namespace NYPL\Services;
 
 use Firebase\JWT\JWT;
 use NYPL\Services\Model\Response\HoldRequestErrorResponse;
+use NYPL\Starter\APILogger;
 use NYPL\Starter\Config;
 use NYPL\Starter\Controller;
 use Slim\Container;
@@ -85,6 +86,8 @@ class ServiceController extends Controller
 
     public function patronIsAuthorized()
     {
+        APILogger::addDebug('Verifying patron is authorized.');
+
         $requestIdentity = $this->getPatronFromRequest();
         $tokenIdentity = $this->getPatronFromToken();
 
@@ -100,6 +103,8 @@ class ServiceController extends Controller
 
     public function isRequestAuthorized()
     {
+        APILogger::addDebug('Verifying valid OAuth scope.');
+
         if ($this->getRequest()->getMethod() === 'GET') {
             $hasScopeAccess = $this->hasReadRequestScope();
         } else {
@@ -146,19 +151,23 @@ class ServiceController extends Controller
 
     protected function getPatronFromRequest()
     {
+        APILogger::addDebug('Retrieving patron ID from request.');
         $payload = json_decode($this->getRequest()->getBody());
         return $payload->patron;
     }
 
     protected function getPublicKey()
     {
+        APILogger::addDebug('Retrieving public key.');
         return file_get_contents(__DIR__ . '/../config/pubkey.pem');
     }
 
     protected function getPatronFromToken()
     {
+        APILogger::addDebug('Retrieving OAuth token.');
         $token = $this->getIdentityHeader()->getToken();
-        $decoded = JWT::decode($token, $this->getPublicKey(), array('RS256'));
+        APILogger::addDebug('Decoding OAuth token.');
+        $decoded = JWT::decode($token, $this->getPublicKey(), ['RS256']);
 
         return $decoded->sub;
     }
@@ -171,7 +180,7 @@ class ServiceController extends Controller
         return $this->getResponse()->withJson(
             new HoldRequestErrorResponse(
                 '403',
-                'invalid-scope',
+                'invalid_scope',
                 'Client does not have sufficient privileges.'
             )
         )->withStatus(403);
@@ -185,7 +194,7 @@ class ServiceController extends Controller
         return $this->getResponse()->withJson(
             new HoldRequestErrorResponse(
                 '403',
-                'invalid-request',
+                'invalid_request',
                 'Client does not have sufficient privileges.'
             )
         )->withStatus(403);

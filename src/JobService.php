@@ -139,6 +139,7 @@ class JobService
             try {
                 $jobId = JobManager::createJob();
                 self::setJobId($jobId);
+                APILogger::addDebug('Job Service ID created.');
             } catch (\Exception $exception) {
                 APILogger::addError('Not able to communicate with the Jobs Service API.');
                 throw new APIException('Jobs Service failed to generate an ID.');
@@ -147,7 +148,7 @@ class JobService
 
         if (!self::getJobId()) {
             self::generateRandomId();
-            APILogger::addInfo('No job started. Job ID returned as UUID.');
+            APILogger::addDebug('No job started. Job ID returned as a UUID. If the job service is needed, please check the environment configuration.');
         }
 
         return self::getJobId();
@@ -169,6 +170,7 @@ class JobService
         self::setJobClient(new JobClient());
         self::setJobStatus(new JobStatus());
         self::setJobStatusSuccess(new JobStatusSuccess());
+        APILogger::addDebug('Job client and status objects inititialized.');
     }
 
     /**
@@ -180,6 +182,7 @@ class JobService
         self::initializeJobClient();
         self::buildJobNotice($holdRequest->getRawData(), $message);
         self::getJobStatus()->setNotice(self::getJobNotice());
+        APILogger::addDebug('Job is being initiated via the Job Service API.', $holdRequest->getRawData());
 
         self::getJobClient()->startJob(
             new Job(['id' => $holdRequest->getJobId()]),
@@ -199,6 +202,7 @@ class JobService
             if ($holdRequest->isSuccess()) {
                 self::buildJobNotice($data, self::JOB_SUCCESS_MESSAGE);
                 self::getJobStatusSuccess()->setNotice(self::getJobNotice());
+                APILogger::addDebug('Success status sent to the Job Service API.', $holdRequest->getRawData());
 
                 self::getJobClient()->success(
                     new Job(['id' => $holdRequest->getJobId()]),
@@ -207,6 +211,7 @@ class JobService
             } else {
                 self::buildJobNotice($data, self::JOB_FAILURE_MESSAGE);
                 self::getJobStatus()->setNotice(self::getJobNotice());
+                APILogger::addDebug('Failure status sent to the Job Service API.', $holdRequest->getRawData());
 
                 self::getJobClient()->failure(
                     new Job(['id' => $holdRequest->getJobId()]),
@@ -227,6 +232,7 @@ class JobService
         $jobNotice = new JobNoticeCreated();
         $jobNotice->setData($data);
         $jobNotice->setText($notice);
+        APILogger::addDebug('Job notice created.', $data);
 
         self::setJobNotice($jobNotice);
     }

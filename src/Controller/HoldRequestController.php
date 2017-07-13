@@ -8,6 +8,7 @@ use NYPL\Services\Model\Response\HoldRequestResponse;
 use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Starter\APIException;
+use NYPL\Starter\APILogger;
 use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
@@ -90,6 +91,7 @@ class HoldRequestController extends ServiceController
         $holdRequest->create();
 
         if ($this->isUseJobService()) {
+            APILogger::addDebug('Initiating job via Job Service API.', ['jobID' => $holdRequest->getJobId()]);
             JobService::beginJob($holdRequest, 'Job started for hold request.');
         }
 
@@ -280,6 +282,7 @@ class HoldRequestController extends ServiceController
         $holdRequest->read();
 
         if ($this->isUseJobService()) {
+            APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
             JobService::finishJob($holdRequest);
         }
 

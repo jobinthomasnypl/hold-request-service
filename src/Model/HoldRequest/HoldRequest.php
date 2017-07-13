@@ -3,6 +3,7 @@ namespace NYPL\Services\Model\HoldRequest;
 
 use NYPL\Services\Model\ElectronicDocumentData;
 use NYPL\Starter\APIException;
+use NYPL\Starter\APILogger;
 use NYPL\Starter\Model\LocalDateTime;
 use NYPL\Starter\Model\ModelInterface\MessageInterface;
 use NYPL\Starter\Model\ModelInterface\ReadInterface;
@@ -235,12 +236,16 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      */
     public function validateData()
     {
-        if (!$this->getPickupLocation() && !$this->getDeliveryLocation()) {
-            throw new APIException('Missing pickupLocation and deliveryLocation values.');
+        APILogger::addDebug('Validating data for hold request.', $this->getRawData());
+
+        if ($this->getRequestType() != 'edd' && (!$this->getPickupLocation() && !$this->getDeliveryLocation())) {
+            APILogger::addDebug('No pickup/delivery location provided.', $this->getRawData());
+            throw new APIException('Missing pickupLocation and deliveryLocation values. One or both must be set.');
         }
 
         if ($this->getRequestType() === 'edd'
             && !$this->docDeliveryData instanceof ElectronicDocumentData) {
+            APILogger::addDebug('EDD object not instantiated.', $this->getRawData());
             throw new APIException('EDD request is missing all details.');
         }
     }
