@@ -85,7 +85,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $patron
      */
-    public function setPatron(string $patron)
+    public function setPatron($patron)
     {
         $this->patron = $patron;
     }
@@ -101,7 +101,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $nyplSource
      */
-    public function setNyplSource(string $nyplSource)
+    public function setNyplSource($nyplSource)
     {
         $this->nyplSource = $nyplSource;
     }
@@ -117,7 +117,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $requestType
      */
-    public function setRequestType(string $requestType)
+    public function setRequestType($requestType)
     {
         $this->requestType = $requestType;
     }
@@ -133,7 +133,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $recordType
      */
-    public function setRecordType(string $recordType)
+    public function setRecordType($recordType)
     {
         $this->recordType = $recordType;
     }
@@ -149,7 +149,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $record
      */
-    public function setRecord(string $record)
+    public function setRecord($record)
     {
         $this->record = $record;
     }
@@ -165,7 +165,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $pickupLocation
      */
-    public function setPickupLocation(string $pickupLocation)
+    public function setPickupLocation($pickupLocation)
     {
         $this->pickupLocation = $pickupLocation;
     }
@@ -181,7 +181,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $deliveryLocation
      */
-    public function setDeliveryLocation(string $deliveryLocation)
+    public function setDeliveryLocation($deliveryLocation)
     {
         $this->deliveryLocation = $deliveryLocation;
     }
@@ -197,7 +197,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param LocalDateTime $neededBy
      */
-    public function setNeededBy(LocalDateTime $neededBy)
+    public function setNeededBy($neededBy)
     {
         $this->neededBy = $neededBy;
     }
@@ -207,7 +207,7 @@ abstract class HoldRequestModel extends Model
      *
      * @return LocalDateTime
      */
-    public function translateNeededBy(string $neededBy = '')
+    public function translateNeededBy($neededBy = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $neededBy);
     }
@@ -223,7 +223,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param string $numberOfCopies
      */
-    public function setNumberOfCopies(string $numberOfCopies)
+    public function setNumberOfCopies($numberOfCopies)
     {
         $this->numberOfCopies = (int) $numberOfCopies;
     }
@@ -231,7 +231,7 @@ abstract class HoldRequestModel extends Model
     /**
      * @param ElectronicDocumentData $docDeliveryData
      */
-    public function setDocDeliveryData(ElectronicDocumentData $docDeliveryData)
+    public function setDocDeliveryData($docDeliveryData)
     {
         $this->docDeliveryData = $docDeliveryData;
     }

@@ -2,7 +2,7 @@
   "name": "nypl-hold-request-service",
   "description": "NYPL Hold Request Service Package",
   "require": {
-    "nypl/microservice-starter": "1.0.9",
+   "nypl/microservice-starter": "1.0.40",
     "ramsey/uuid": "3.6.1",
     "firebase/php-jwt": "5.0.0"
   },
@@ -18,6 +18,7 @@
   },
   "scripts": {
     "post-update-cmd": [
+      "php -r \"copy('vendor/nypl/microservice-starter/scripts/parser.js', 'parser.js');\"",
       "php -r \"copy('vendor/nypl/microservice-starter/scripts/index.js', 'index.js');\""
     ]
   }

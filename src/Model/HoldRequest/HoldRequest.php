@@ -140,7 +140,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param string $jobId
      */
-    public function setJobId(string $jobId)
+    public function setJobId($jobId)
     {
         $this->jobId = $jobId;
     }
@@ -156,7 +156,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param LocalDateTime $createdDate
      */
-    public function setCreatedDate(LocalDateTime $createdDate)
+    public function setCreatedDate($createdDate)
     {
         $this->createdDate = $createdDate;
     }
@@ -166,7 +166,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      *
      * @return LocalDateTime
      */
-    public function translateCreatedDate(string $createdDate = '')
+    public function translateCreatedDate($createdDate = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $createdDate);
     }
@@ -182,7 +182,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param LocalDateTime $updatedDate
      */
-    public function setUpdatedDate(LocalDateTime $updatedDate)
+    public function setUpdatedDate($updatedDate)
     {
         $this->updatedDate = $updatedDate;
     }
@@ -192,7 +192,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      *
      * @return LocalDateTime
      */
-    public function translateUpdatedDate(string $updatedDate = '')
+    public function translateUpdatedDate($updatedDate = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $updatedDate);
     }
@@ -200,7 +200,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @return boolean
      */
-    public function isSuccess()
+    public function isSuccessful()
     {
         return $this->success;
     }
