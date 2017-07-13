@@ -8,14 +8,8 @@ use NYPL\Services\Model\Response\HoldRequestResponse;
 use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Starter\APIException;
-use NYPL\Starter\APILogger;
-use NYPL\Starter\CacheModel\BaseJob\Job;
-use NYPL\Starter\CacheModel\JobNotice\JobNoticeCreated;
-use NYPL\Starter\CacheModel\JobStatus;
 use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
-use NYPL\Starter\JobClient;
-use NYPL\Starter\JobStatus\JobStatusSuccess;
 use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -75,33 +69,29 @@ class HoldRequestController extends ServiceController
     {
         $data = $this->getRequest()->getParsedBody();
 
-        $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
+        $data['jobId'] = JobService::generateJobId($this->isUseJobService());
         $data['success'] = $data['processed'] = false;
 
         $holdRequest = new HoldRequest($data);
 
-        if (isset($data['requestType']) && (strtolower($data['requestType']) === 'edd' && !$data['docDeliveryData'])) {
+        try {
+            $holdRequest->validateData();
+        } catch (APIException $exception) {
             return $this->getResponse()->withJson(
                 new HoldRequestErrorResponse(
                     500,
-                    'invalid-edd',
-                    'EDD request is missing all details.',
-                    new APIException('An error occurred', $data)
+                    'invalid_request',
+                    $exception->getMessage(),
+                    $exception
                 )
             )->withStatus(500);
         }
 
         $holdRequest->create();
 
-        $jobClient = new JobClient();
-        $jobStatus = new JobStatus();
-        $jobNotice = $this->buildJobNotice($data, 'Job started for hold request.');
-        $jobStatus->setNotice($jobNotice);
-
-        $jobClient->startJob(
-            new Job(['id' => $data['jobId']]),
-            $jobStatus
-        );
+        if ($this->isUseJobService()) {
+            JobService::beginJob($holdRequest, 'Job started for hold request.');
+        }
 
         return $this->getResponse()->withJson(
             new HoldRequestResponse($holdRequest)
@@ -129,6 +119,13 @@ class HoldRequestController extends ServiceController
      *         required=false,
      *         type="string",
      *         description="ID of record provided by ILS"
+     *     ),
+     *     @SWG\Response(
+     *         name="processed",
+     *         in="query",
+     *         required=false,
+     *         type="string",
+     *         description="Process status of a hold request."
      *     ),
      *     @SWG\Response(
      *         response=200,
@@ -161,7 +158,7 @@ class HoldRequestController extends ServiceController
             new ModelSet(new HoldRequest()),
             new HoldRequestsResponse(),
             null,
-            ['patron', 'record']
+            ['patron', 'record', 'processed']
         );
     }
 
@@ -282,46 +279,12 @@ class HoldRequestController extends ServiceController
 
         $holdRequest->read();
 
-        $jobClient = new JobClient();
-        $jobStatus = new JobStatus();
-        $jobStatusSuccess = new JobStatusSuccess();
-
-        try {
-            if ($holdRequest->isSuccessful()) {
-                $jobNotice = $this->buildJobNotice($holdRequest, 'Job finished successfully for hold request.');
-                $jobStatusSuccess->setNotice($jobNotice);
-                $jobClient->success(
-                    new Job(['id' => $holdRequest->getJobId()]),
-                    $jobStatusSuccess
-                );
-            } else {
-                $jobNotice = $this->buildJobNotice($holdRequest, 'Job finished unsuccessfully for hold request.');
-                $jobStatus->setNotice($jobNotice);
-                $jobClient->failure(
-                    new Job(['id' => $holdRequest->getJobId()]),
-                    $jobStatus
-                );
-            }
-        } catch (\Exception $exception) {
-            APILogger::addInfo('Job threw an exception. ' . $exception->getMessage());
+        if ($this->isUseJobService()) {
+            JobService::finishJob($holdRequest);
         }
 
         return $this->getResponse()->withJson(
             new HoldRequestResponse($holdRequest)
         );
-    }
-
-    /**
-     * @param $data
-     * @param $notice
-     * @return \NYPL\Starter\CacheModel\JobNotice\JobNoticeCreated
-     */
-    protected function buildJobNotice($data, $notice)
-    {
-        $jobNotice = new JobNoticeCreated();
-        $jobNotice->setData($data);
-        $jobNotice->setText($notice);
-
-        return $jobNotice;
     }
 }

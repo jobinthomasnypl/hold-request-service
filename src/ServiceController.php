@@ -3,6 +3,7 @@ namespace NYPL\Services;
 
 use Firebase\JWT\JWT;
 use NYPL\Services\Model\Response\HoldRequestErrorResponse;
+use NYPL\Starter\Config;
 use NYPL\Starter\Controller;
 use Slim\Container;
 
@@ -20,6 +21,11 @@ class ServiceController extends Controller
     const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_request';
 
     /**
+     * @var bool
+     */
+    public $useJobService;
+
+    /**
      * @var Container
      */
     public $container;
@@ -32,6 +38,7 @@ class ServiceController extends Controller
      */
     public function __construct(Container $container, int $cacheSeconds = 0)
     {
+        $this->setUseJobService(Config::get('USE_JOB_SERVICE'));
         $this->setResponse($container->get('response'));
         $this->setRequest($container->get('request'));
 
@@ -58,6 +65,22 @@ class ServiceController extends Controller
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isUseJobService(): bool
+    {
+        return $this->useJobService;
+    }
+
+    /**
+     * @param boolean $useJobService
+     */
+    public function setUseJobService(bool $useJobService)
+    {
+        $this->useJobService = $useJobService;
     }
 
     public function patronIsAuthorized()

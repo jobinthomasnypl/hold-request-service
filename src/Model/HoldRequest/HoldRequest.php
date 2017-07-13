@@ -1,7 +1,8 @@
 <?php
 namespace NYPL\Services\Model\HoldRequest;
 
-use NYPL\Services\Model\HoldRequestModel;
+use NYPL\Services\Model\ElectronicDocumentData;
+use NYPL\Starter\APIException;
 use NYPL\Starter\Model\LocalDateTime;
 use NYPL\Starter\Model\ModelInterface\MessageInterface;
 use NYPL\Starter\Model\ModelInterface\ReadInterface;
@@ -200,7 +201,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @return boolean
      */
-    public function isSuccessful()
+    public function isSuccess()
     {
         return $this->success;
     }
@@ -227,5 +228,20 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public function setProcessed(bool $processed)
     {
         $this->processed = $processed;
+    }
+
+    /**
+     * @throws \NYPL\Starter\APIException
+     */
+    public function validateData()
+    {
+        if (!$this->getPickupLocation() && !$this->getDeliveryLocation()) {
+            throw new APIException('Missing pickupLocation and deliveryLocation values.');
+        }
+
+        if ($this->getRequestType() === 'edd'
+            && !$this->docDeliveryData instanceof ElectronicDocumentData) {
+            throw new APIException('EDD request is missing all details.');
+        }
     }
 }
