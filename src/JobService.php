@@ -148,7 +148,10 @@ class JobService
 
         if (!self::getJobId()) {
             self::generateRandomId();
-            APILogger::addDebug('Job ID returned as a UUID. If the job service is needed, please check the environment configuration.', [self::getJobId()]);
+            APILogger::addDebug(
+                'Job ID returned as a UUID. If the job service is needed, please check the environment configuration.',
+                [self::getJobId()]
+            );
         }
 
         return self::getJobId();
@@ -170,7 +173,7 @@ class JobService
         self::setJobClient(new JobClient());
         self::setJobStatus(new JobStatus());
         self::setJobStatusSuccess(new JobStatusSuccess());
-        APILogger::addDebug('Job client and status objects inititialized.');
+        APILogger::addDebug('Job client and status objects initialized.');
     }
 
     /**
@@ -183,7 +186,7 @@ class JobService
         self::buildJobNotice($holdRequest->getRawData(), $message);
         self::getJobStatus()->setNotice(self::getJobNotice());
 
-        APILogger::addDebug('Job is being initiated via the Job Service API.', [$jobStatus]);
+        APILogger::addDebug('Job is being initiated via the Job Service API.', [self::getJobStatus()]);
 
         self::getJobClient()->startJob(
             new Job(['id' => $holdRequest->getJobId()]),
