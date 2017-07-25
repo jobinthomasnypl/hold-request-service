@@ -68,7 +68,7 @@ class HoldRequestController extends ServiceController
      */
     public function createHoldRequest()
     {
-        APILogger::addInfo('Hold request initiated.');
+        APILogger::addDebug('Hold request initiated.');
 
         try {
             if (!$this->isRequestAuthorized()) {
@@ -78,23 +78,30 @@ class HoldRequestController extends ServiceController
 
             $data = $this->getRequest()->getParsedBody();
 
-            if (strtolower($data['requestType']) === 'edd' && !$data['docDeliveryData']) {
-                return $this->getResponse()->withJson(
-                    new HoldRequestErrorResponse(
-                        500,
-                        'invalid-hold_request',
-                        'EDD request is missing all details.',
-                        new APIException('An error occurred', $data)
-                    )
-                )->withStatus(500);
-            }
-
-            $data['jobId'] = JobService::generateJobId(Config::get('USE_JOB_SERVICE'));
+            $data['jobId'] = JobService::generateJobId($this->isUseJobService());
             $data['success'] = $data['processed'] = false;
 
             $holdRequest = new HoldRequest($data);
 
+            try {
+                $holdRequest->validateData();
+            } catch (APIException $exception) {
+                return $this->getResponse()->withJson(
+                    new HoldRequestErrorResponse(
+                        500,
+                        'invalid_request',
+                        $exception->getMessage(),
+                        $exception
+                    )
+                )->withStatus(500);
+            }
+
             $holdRequest->create();
+
+            if ($this->isUseJobService()) {
+                APILogger::addDebug('Initiating job via Job Service API.', ['jobID' => $holdRequest->getJobId()]);
+                JobService::beginJob($holdRequest, 'Job started for hold request.');
+            }
 
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
@@ -131,6 +138,13 @@ class HoldRequestController extends ServiceController
      *         required=false,
      *         type="string",
      *         description="ID of record provided by ILS"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="processed",
+     *         in="query",
+     *         required=false,
+     *         type="string",
+     *         description="Process status of a hold request."
      *     ),
      *     @SWG\Response(
      *         response=200,
@@ -169,7 +183,7 @@ class HoldRequestController extends ServiceController
                 new ModelSet(new HoldRequest()),
                 new HoldRequestsResponse(),
                 null,
-                ['patron', 'record']
+                ['patron', 'record', 'processed']
             );
         } catch (\Exception $exception) {
             throw new APIException(
@@ -314,16 +328,18 @@ class HoldRequestController extends ServiceController
 
             $holdRequest->addFilter(new Filter('id', $args['id']));
 
+            APILogger::addDebug('Hold request update initiated.');
+
             $holdRequest->update(
                 $this->getRequest()->getParsedBody()
             );
 
-            $holdRequestJob = JobService::getJob();
-            if ($holdRequestJob->getStatusCode() === 200) {
-                JobService::updateJobStatus($holdRequest->isSuccess());
-            }
+            $holdRequest->read();
 
-            APILogger::addInfo('Hold request update initiated.');
+            if ($this->isUseJobService()) {
+                APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
+                JobService::finishJob($holdRequest);
+            }
 
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)

@@ -20,6 +20,11 @@ class ServiceController extends Controller
     const GLOBAL_REQUEST_SCOPE = 'readwrite:hold_request';
 
     /**
+     * @var bool
+     */
+    public $useJobService;
+
+    /**
      * @var Container
      */
     public $container;
@@ -58,6 +63,22 @@ class ServiceController extends Controller
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isUseJobService(): bool
+    {
+        return $this->useJobService;
+    }
+
+    /**
+     * @param boolean $useJobService
+     */
+    public function setUseJobService(bool $useJobService)
+    {
+        $this->useJobService = $useJobService;
     }
 
     public function patronIsAuthorized()
