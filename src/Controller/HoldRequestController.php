@@ -122,7 +122,7 @@ class HoldRequestController extends ServiceController
      *         type="string",
      *         description="ID of record provided by ILS"
      *     ),
-     *     @SWG\Response(
+     *     @SWG\Parameter(
      *         name="processed",
      *         in="query",
      *         required=false,
