@@ -243,10 +243,21 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
             throw new APIException('Missing pickupLocation and deliveryLocation values. One or both must be set.');
         }
 
-        if ($this->getRequestType() === 'edd'
-            && !$this->docDeliveryData instanceof ElectronicDocumentData) {
-            APILogger::addDebug('EDD object not instantiated.', $this->getRawData());
-            throw new APIException('EDD request is missing all details.');
+        if ($this->getRequestType() === 'edd') {
+            $this->nullifyLocation();
+            if (!$this->docDeliveryData instanceof ElectronicDocumentData) {
+                APILogger::addDebug('EDD object not instantiated.', $this->getRawData());
+                throw new APIException('EDD request is missing all details.');
+            }
         }
+    }
+
+    /**
+     * Helper to ensure null values for location elements are set for consistency.
+     */
+    public function nullifyLocation()
+    {
+        $this->setPickupLocation(null);
+        $this->setDeliveryLocation(null);
     }
 }
