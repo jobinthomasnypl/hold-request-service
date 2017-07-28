@@ -15,18 +15,6 @@ class HoldRequestTest extends TestCase
             {
                 parent::__construct($data);
             }
-
-            /**
-             * @param null|string $requestType
-             */
-            public function setRequestType($requestType)
-            {
-                if ($requestType == 'hold' || $requestType == 'edd') {
-                    $this->requestType = $requestType;
-                } else {
-                    $this->requestType = 'hold';
-                }
-            }
         };
         parent::setUp();
     }
