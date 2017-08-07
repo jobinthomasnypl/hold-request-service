@@ -12,8 +12,6 @@ use NYPL\Starter\Model\ModelTrait\TranslateTrait;
  */
 class NewHoldRequest extends HoldRequestModel
 {
-    use TranslateTrait;
-
     const VALID_REQUEST_TYPES = ['hold', 'edd'];
 
     /**
@@ -34,10 +32,7 @@ class NewHoldRequest extends HoldRequestModel
             $this->requestType = $requestType;
         } else {
             $this->requestType = 'hold';
-            APILogger::addInfo(
-                'Invalid requestType received. Reset to default "hold."',
-                []
-            );
+            APILogger::addInfo('Invalid requestType received. Reset to default "hold."');
         }
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace NYPL\Services\Controller;
 
+use NYPL\Services\Filter\DateQueryFilter;
 use NYPL\Services\JobService;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
@@ -9,7 +10,6 @@ use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Starter\APIException;
 use NYPL\Starter\APILogger;
-use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
@@ -64,40 +64,43 @@ class HoldRequestController extends ServiceController
      * )
      *
      * @return Response
-     * @throws APIException
      */
     public function createHoldRequest()
     {
-        $data = $this->getRequest()->getParsedBody();
-
-        $data['jobId'] = JobService::generateJobId($this->isUseJobService());
-        $data['success'] = $data['processed'] = false;
-
-        $holdRequest = new HoldRequest($data);
-
         try {
-            $holdRequest->validateData();
-        } catch (APIException $exception) {
+            $data = $this->getRequest()->getParsedBody();
+
+            $data['jobId'] = JobService::generateJobId($this->isUseJobService());
+            $data['success'] = $data['processed'] = false;
+
+            $holdRequest = new HoldRequest($data);
+
+            try {
+                $holdRequest->validateData();
+            } catch (APIException $exception) {
+                return $this->invalidRequestResponse($exception);
+            }
+
+            if ($this->isUseJobService()) {
+                APILogger::addDebug('Initiating job via Job Service API.', ['jobID' => $holdRequest->getJobId()]);
+                JobService::beginJob($holdRequest, 'Job started for hold request.');
+            }
+
+            $holdRequest->create();
+
             return $this->getResponse()->withJson(
-                new HoldRequestErrorResponse(
-                    500,
-                    'invalid_request',
-                    $exception->getMessage(),
-                    $exception
-                )
-            )->withStatus(500);
+                new HoldRequestResponse($holdRequest)
+            );
+        } catch (\Exception $exception) {
+            $errorResp = new HoldRequestErrorResponse(
+                500,
+                'create-hold-request-failure',
+                'Unable to create hold request due to problems with dependent services.',
+                $exception
+            );
+            $errorResp->setError($errorResp->translateException($exception));
+            return $this->getResponse()->withJson($errorResp)->withStatus(500);
         }
-
-        $holdRequest->create();
-
-        if ($this->isUseJobService()) {
-            APILogger::addDebug('Initiating job via Job Service API.', ['jobID' => $holdRequest->getJobId()]);
-            JobService::beginJob($holdRequest, 'Job started for hold request.');
-        }
-
-        return $this->getResponse()->withJson(
-            new HoldRequestResponse($holdRequest)
-        );
     }
 
     /**
@@ -129,6 +132,13 @@ class HoldRequestController extends ServiceController
      *         type="string",
      *         description="Process status of a hold request."
      *     ),
+     *     @SWG\Parameter(
+     *         name="createdDate",
+     *         in="query",
+     *         required=false,
+     *         type="string",
+     *         description="Creation date of a hold request. (Format: YYYY-MM-DD)"
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="Successful operation",
@@ -152,14 +162,24 @@ class HoldRequestController extends ServiceController
      * )
      *
      * @return Response
-     * @throws APIException
      */
     public function getHoldRequests()
     {
+        $dateFilter = null;
+        if ($this->getRequest()->getParam('createdDate')) {
+            $dateFilter = new DateQueryFilter(
+                'createdDate',
+                $this->getRequest()->getParam('createdDate'),
+                false,
+                '',
+                'LIKE'
+            );
+        }
+
         return  $this->getDefaultReadResponse(
             new ModelSet(new HoldRequest()),
             new HoldRequestsResponse(),
-            null,
+            $dateFilter,
             ['patron', 'record', 'processed']
         );
     }
@@ -267,27 +287,37 @@ class HoldRequestController extends ServiceController
      * @param array $args
      *
      * @return Response
-     * @throws APIException
      */
     public function updateHoldRequest(Request $request, Response $response, array $args)
     {
-        $holdRequest = new HoldRequest();
+        try {
+            $holdRequest = new HoldRequest();
 
-        $holdRequest->addFilter(new Filter('id', $args['id']));
+            $holdRequest->addFilter(new Filter('id', $args['id']));
 
-        $holdRequest->update(
-            $this->getRequest()->getParsedBody()
-        );
+            $holdRequest->read();
 
-        $holdRequest->read();
+            if ($this->isUseJobService()) {
+                APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
+                JobService::finishJob($holdRequest);
+            }
 
-        if ($this->isUseJobService()) {
-            APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
-            JobService::finishJob($holdRequest);
+            $holdRequest->update(
+                $this->getRequest()->getParsedBody()
+            );
+
+            return $this->getResponse()->withJson(
+                new HoldRequestResponse($holdRequest)
+            );
+        } catch (\Exception $exception) {
+            $errorResp = new HoldRequestErrorResponse(
+                500,
+                'update-hold-request-failure',
+                'Unable to update a hold request due to problems with dependent services.',
+                $exception
+            );
+            $errorResp->setError($errorResp->translateException($exception));
+            return $this->getResponse()->withJson($errorResp)->withStatus(500);
         }
-
-        return $this->getResponse()->withJson(
-            new HoldRequestResponse($holdRequest)
-        );
     }
 }

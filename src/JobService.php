@@ -142,14 +142,19 @@ class JobService
                 APILogger::addDebug('Job Service ID created.', [self::getJobId()]);
             } catch (\Exception $exception) {
                 APILogger::addError('Not able to communicate with the Jobs Service API.');
-                throw new APIException('Jobs Service failed to generate an ID.');
+                throw new APIException(
+                    'Jobs Service failed to generate an ID. Service may be misconfigured or unavailable.',
+                    [],
+                    $exception->getCode(),
+                    $exception
+                );
             }
         }
 
         if (!self::getJobId()) {
             self::generateRandomId();
             APILogger::addDebug(
-                'Job ID returned as a UUID. If the job service is needed, please check the environment configuration.',
+                'Job ID returned as a UUID. If the Jobs Service is needed, please check your configuration.',
                 [self::getJobId()]
             );
         }
@@ -170,10 +175,19 @@ class JobService
      */
     protected static function initializeJobClient()
     {
-        self::setJobClient(new JobClient());
-        self::setJobStatus(new JobStatus());
-        self::setJobStatusSuccess(new JobStatusSuccess());
-        APILogger::addDebug('Job client and status objects initialized.');
+        try {
+            self::setJobClient(new JobClient());
+            self::setJobStatus(new JobStatus());
+            self::setJobStatusSuccess(new JobStatusSuccess());
+            APILogger::addDebug('Job client and status objects initialized.');
+        } catch (\Exception $exception) {
+            throw new APIException(
+                'Jobs Service failed to initialize. Service may be misconfigured or unavailable.',
+                [],
+                $exception->getCode(),
+                $exception
+            );
+        }
     }
 
     /**
@@ -200,14 +214,14 @@ class JobService
     public static function finishJob(HoldRequest $holdRequest)
     {
         self::initializeJobClient();
-        $data = $holdRequest->getRawData();
+        $data = (array)$holdRequest;
 
         try {
             if ($holdRequest->isSuccess()) {
                 self::buildJobNotice($data, self::JOB_SUCCESS_MESSAGE);
                 self::getJobStatusSuccess()->setNotice(self::getJobNotice());
 
-                APILogger::addDebug('Success status sent to the Job Service API.', $holdRequest->getRawData());
+                APILogger::addDebug('Success status sent to the Job Service API.');
 
                 self::getJobClient()->success(
                     new Job(['id' => $holdRequest->getJobId()]),
@@ -217,7 +231,7 @@ class JobService
                 self::buildJobNotice($data, self::JOB_FAILURE_MESSAGE);
                 self::getJobStatus()->setNotice(self::getJobNotice());
 
-                APILogger::addDebug('Failure status sent to the Job Service API.', $holdRequest->getRawData());
+                APILogger::addDebug('Failure status sent to the Job Service API.');
 
                 self::getJobClient()->failure(
                     new Job(['id' => $holdRequest->getJobId()]),
@@ -230,7 +244,7 @@ class JobService
     }
 
     /**
-     * @param array       $data
+     * @param array  $data
      * @param string $notice
      */
     protected static function buildJobNotice(array $data, $notice = '')
@@ -238,7 +252,7 @@ class JobService
         $jobNotice = new JobNoticeCreated();
         $jobNotice->setData($data);
         $jobNotice->setText($notice);
-        APILogger::addDebug('Job notice created.', $data);
+        APILogger::addDebug('Job notice created.', [$data]);
 
         self::setJobNotice($jobNotice);
     }

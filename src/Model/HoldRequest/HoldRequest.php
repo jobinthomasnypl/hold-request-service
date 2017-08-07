@@ -10,6 +10,7 @@ use NYPL\Starter\Model\ModelInterface\ReadInterface;
 use NYPL\Starter\Model\ModelTrait\DBCreateTrait;
 use NYPL\Starter\Model\ModelTrait\DBReadTrait;
 use NYPL\Starter\Model\ModelTrait\DBUpdateTrait;
+use NYPL\Starter\Model\ModelTrait\TranslateTrait;
 
 /**
  * @SWG\Definition(title="HoldRequest", type="object")
@@ -236,20 +237,24 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      */
     public function validateData()
     {
-        APILogger::addDebug('Validating data for hold request.', $this->getRawData());
+        APILogger::addDebug('Validating request payload.');
 
         if ($this->getRequestType() != 'edd' && (!$this->getPickupLocation() && !$this->getDeliveryLocation())) {
-            APILogger::addDebug('No pickup/delivery location provided.', $this->getRawData());
-            throw new APIException('Missing pickupLocation and deliveryLocation values. One or both must be set.');
+            APILogger::addDebug('No pickup/delivery location provided.', (array)$this);
+            throw new APIException(
+                'Missing pickup and delivery values. One or both must be set for general hold requests.'
+            );
         }
 
         if ($this->getRequestType() === 'edd') {
             $this->nullifyLocation();
             if (!$this->docDeliveryData instanceof ElectronicDocumentData) {
-                APILogger::addDebug('EDD object not instantiated.', $this->getRawData());
+                APILogger::addDebug('EDD object not instantiated.', (array)$this);
                 throw new APIException('EDD request is missing all details.');
             }
         }
+
+        APILogger::addDebug('Request payload validation passed.');
     }
 
     /**

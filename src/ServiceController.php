@@ -173,30 +173,32 @@ class ServiceController extends Controller
     }
 
     /**
+     * @param \Exception $exception
      * @return \Slim\Http\Response
      */
-    public function invalidScopeResponse()
+    public function invalidScopeResponse(\Exception $exception)
     {
         return $this->getResponse()->withJson(
             new HoldRequestErrorResponse(
                 '403',
-                'invalid_scope',
-                'Client does not have sufficient privileges.'
+                'invalid-scope',
+                'Client does not have sufficient privileges. ' . $exception->getMessage()
             )
         )->withStatus(403);
     }
 
     /**
+     * @param \Exception $exception
      * @return \Slim\Http\Response
      */
-    public function invalidRequestResponse()
+    public function invalidRequestResponse(\Exception $exception)
     {
         return $this->getResponse()->withJson(
             new HoldRequestErrorResponse(
-                '403',
-                'invalid_request',
-                'Client does not have sufficient privileges.'
+                '400',
+                'invalid-request',
+                'An invalid request was sent to the API. ' . $exception->getMessage()
             )
-        )->withStatus(403);
+        )->withStatus(400);
     }
 }
