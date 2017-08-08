@@ -1,7 +1,9 @@
 <?php
 namespace NYPL\Services\Model\HoldRequest;
 
-use NYPL\Services\Model\HoldRequestModel;
+use NYPL\Services\Model\ElectronicDocumentData;
+use NYPL\Starter\APIException;
+use NYPL\Starter\APILogger;
 use NYPL\Starter\Model\LocalDateTime;
 use NYPL\Starter\Model\ModelInterface\MessageInterface;
 use NYPL\Starter\Model\ModelInterface\ReadInterface;
@@ -140,7 +142,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param string $jobId
      */
-    public function setJobId(string $jobId)
+    public function setJobId($jobId)
     {
         $this->jobId = $jobId;
     }
@@ -156,7 +158,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param LocalDateTime $createdDate
      */
-    public function setCreatedDate(LocalDateTime $createdDate)
+    public function setCreatedDate($createdDate)
     {
         $this->createdDate = $createdDate;
     }
@@ -166,7 +168,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      *
      * @return LocalDateTime
      */
-    public function translateCreatedDate(string $createdDate = '')
+    public function translateCreatedDate($createdDate = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $createdDate);
     }
@@ -182,7 +184,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @param LocalDateTime $updatedDate
      */
-    public function setUpdatedDate(LocalDateTime $updatedDate)
+    public function setUpdatedDate($updatedDate)
     {
         $this->updatedDate = $updatedDate;
     }
@@ -192,7 +194,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
      *
      * @return LocalDateTime
      */
-    public function translateUpdatedDate(string $updatedDate = '')
+    public function translateUpdatedDate($updatedDate = '')
     {
         return new LocalDateTime(LocalDateTime::FORMAT_DATE_TIME_RFC, $updatedDate);
     }
@@ -227,5 +229,24 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     public function setProcessed(bool $processed)
     {
         $this->processed = $processed;
+    }
+
+    /**
+     * @throws \NYPL\Starter\APIException
+     */
+    public function validateData()
+    {
+        APILogger::addDebug('Validating data for hold request.', $this->getRawData());
+
+        if ($this->getRequestType() != 'edd' && (!$this->getPickupLocation() && !$this->getDeliveryLocation())) {
+            APILogger::addDebug('No pickup/delivery location provided.', $this->getRawData());
+            throw new APIException('Missing pickupLocation and deliveryLocation values. One or both must be set.');
+        }
+
+        if ($this->getRequestType() === 'edd'
+            && !$this->docDeliveryData instanceof ElectronicDocumentData) {
+            APILogger::addDebug('EDD object not instantiated.', $this->getRawData());
+            throw new APIException('EDD request is missing all details.');
+        }
     }
 }

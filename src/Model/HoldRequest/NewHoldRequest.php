@@ -17,27 +17,26 @@ class NewHoldRequest extends HoldRequestModel
     const VALID_REQUEST_TYPES = ['hold', 'edd'];
 
     /**
-     * @param string $requestType
-     *
+     * @param null|string $requestType
      * @return bool
      */
-    protected function isValidRequestType(string $requestType)
+    protected function isValidRequestType($requestType)
     {
         return in_array($requestType, self::VALID_REQUEST_TYPES);
     }
 
     /**
-     * @param string $requestType
+     * @param null|string $requestType
      */
-    public function setRequestType(string $requestType)
+    public function setRequestType($requestType)
     {
         if ($this->isValidRequestType($requestType)) {
             $this->requestType = $requestType;
         } else {
             $this->requestType = 'hold';
             APILogger::addInfo(
-                'Invalid request type {type} received. Reset to default "hold."',
-                ['type' => $requestType]
+                'Invalid requestType received. Reset to default "hold."',
+                []
             );
         }
     }

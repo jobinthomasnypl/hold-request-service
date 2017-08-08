@@ -94,7 +94,7 @@ class ElectronicDocumentData extends Model
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getAuthor()
     {
@@ -102,9 +102,9 @@ class ElectronicDocumentData extends Model
     }
 
     /**
-     * @param string $author
+     * @param null|string $author
      */
-    public function setAuthor(string $author)
+    public function setAuthor($author)
     {
         $this->author = $author;
     }
@@ -142,7 +142,7 @@ class ElectronicDocumentData extends Model
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getIssue()
     {
@@ -150,15 +150,15 @@ class ElectronicDocumentData extends Model
     }
 
     /**
-     * @param string $issue
+     * @param null|string $issue
      */
-    public function setIssue(string $issue)
+    public function setIssue($issue)
     {
         $this->issue = $issue;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getVolume()
     {
@@ -166,25 +166,25 @@ class ElectronicDocumentData extends Model
     }
 
     /**
-     * @param string $volume
+     * @param null|string $volume
      */
-    public function setVolume(string $volume)
+    public function setVolume($volume)
     {
         $this->volume = $volume;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getRequestNotes(): string
+    public function getRequestNotes()
     {
         return $this->requestNotes;
     }
 
     /**
-     * @param string $requestNotes
+     * @param null|string $requestNotes
      */
-    public function setRequestNotes(string $requestNotes)
+    public function setRequestNotes($requestNotes)
     {
         $this->requestNotes = $requestNotes;
     }
