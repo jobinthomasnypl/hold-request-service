@@ -81,25 +81,20 @@ class HoldRequestController extends ServiceController
                 return $this->invalidRequestResponse($exception);
             }
 
+            $holdRequest->create();
+
             if ($this->isUseJobService()) {
                 APILogger::addDebug('Initiating job via Job Service API.', ['jobID' => $holdRequest->getJobId()]);
                 JobService::beginJob($holdRequest, 'Job started for hold request.');
             }
 
-            $holdRequest->create();
-
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
         } catch (\Exception $exception) {
-            $errorResp = new HoldRequestErrorResponse(
-                500,
-                'create-hold-request-failure',
-                'Unable to create hold request due to problems with dependent services.',
-                $exception
-            );
-            $errorResp->setError($errorResp->translateException($exception));
-            return $this->getResponse()->withJson($errorResp)->withStatus(500);
+            $errorType = 'create-hold-request-error';
+            $errorMsg = 'Unable to create hold request due to a problem with dependent services.';
+            return $this->processException($errorType, $errorMsg, $exception, $this->getRequest());
         }
     }
 
@@ -292,32 +287,50 @@ class HoldRequestController extends ServiceController
     {
         try {
             $holdRequest = new HoldRequest();
-
             $holdRequest->addFilter(new Filter('id', $args['id']));
-
             $holdRequest->read();
+
+            $holdRequest->update(
+                $this->getRequest()->getParsedBody()
+            );
 
             if ($this->isUseJobService()) {
                 APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
                 JobService::finishJob($holdRequest);
             }
 
-            $holdRequest->update(
-                $this->getRequest()->getParsedBody()
-            );
-
-            return $this->getResponse()->withJson(
-                new HoldRequestResponse($holdRequest)
-            );
+            return $this->getResponse()->withJson(new HoldRequestResponse($holdRequest));
         } catch (\Exception $exception) {
-            $errorResp = new HoldRequestErrorResponse(
-                500,
-                'update-hold-request-failure',
-                'Unable to update a hold request due to problems with dependent services.',
-                $exception
-            );
-            $errorResp->setError($errorResp->translateException($exception));
-            return $this->getResponse()->withJson($errorResp)->withStatus(500);
+            $errorType = 'update-hold-request-error';
+            $errorMsg = 'Unable to update hold request. ' . $exception->getMessage();
+            return $this->processException($errorType, $errorMsg, $exception, $request);
         }
+    }
+
+    /**
+     * @param string     $errorType
+     * @param string     $errorMessage
+     * @param \Exception $exception
+     * @param Request    $request
+     * @return \Slim\Http\Response
+     */
+    protected function processException($errorType, $errorMessage, \Exception $exception, Request $request)
+    {
+        APILogger::addInfo(get_class($exception) . ': ' . $exception->getMessage(), [$request->getAttributes()]);
+
+        $statusCode = 500;
+
+        if ($exception instanceof APIException) {
+            $statusCode = $exception->getHttpCode();
+        }
+
+        $errorResp = new HoldRequestErrorResponse(
+            $statusCode,
+            $errorType,
+            $errorMessage,
+            $exception
+        );
+        $errorResp->setError($errorResp->translateException($exception));
+        return $this->getResponse()->withJson($errorResp)->withStatus($statusCode);
     }
 }

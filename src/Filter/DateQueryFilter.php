@@ -27,6 +27,10 @@ class DateQueryFilter extends Filter
     }
 
     /**
+     * Validate a string as a valid date ensuring it has not been adjusted by the DateTime::createFromFormat()
+     * construct which errs on the side of caution creating a valid date from invalid input,
+     * i.e. 2017-08-32 becomes 2017-09-01.
+     *
      * @param $date
      * @return bool
      */

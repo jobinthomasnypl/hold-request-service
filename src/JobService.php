@@ -145,8 +145,9 @@ class JobService
                 throw new APIException(
                     'Jobs Service failed to generate an ID. Service may be misconfigured or unavailable.',
                     [],
-                    $exception->getCode(),
-                    $exception
+                    0,
+                    $exception,
+                    $exception->getCode()
                 );
             }
         }
@@ -184,8 +185,9 @@ class JobService
             throw new APIException(
                 'Jobs Service failed to initialize. Service may be misconfigured or unavailable.',
                 [],
-                $exception->getCode(),
-                $exception
+                0,
+                $exception,
+                $exception->getCode()
             );
         }
     }
@@ -214,7 +216,8 @@ class JobService
     public static function finishJob(HoldRequest $holdRequest)
     {
         self::initializeJobClient();
-        $data = (array)$holdRequest;
+        $holdRequest->read();
+        $data = $holdRequest->getRawData();
 
         try {
             if ($holdRequest->isSuccess()) {
@@ -252,7 +255,7 @@ class JobService
         $jobNotice = new JobNoticeCreated();
         $jobNotice->setData($data);
         $jobNotice->setText($notice);
-        APILogger::addDebug('Job notice created.', [$data]);
+        APILogger::addDebug('Job notice created.', $data);
 
         self::setJobNotice($jobNotice);
     }
