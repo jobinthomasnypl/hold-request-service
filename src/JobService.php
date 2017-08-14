@@ -202,7 +202,10 @@ class JobService
         self::buildJobNotice($holdRequest->getRawData(), $message);
         self::getJobStatus()->setNotice(self::getJobNotice());
 
-        APILogger::addDebug('Job is being initiated via the Job Service API.', [self::getJobStatus()]);
+        APILogger::addDebug(
+            'Job is being initiated via the Job Service API. (RequestID: ' . $holdRequest->getId() . ')',
+            [self::getJobStatus()]
+        );
 
         self::getJobClient()->startJob(
             new Job(['id' => $holdRequest->getJobId()]),
@@ -224,7 +227,9 @@ class JobService
                 self::buildJobNotice($data, self::JOB_SUCCESS_MESSAGE);
                 self::getJobStatusSuccess()->setNotice(self::getJobNotice());
 
-                APILogger::addDebug('Success status sent to the Job Service API.');
+                APILogger::addDebug(
+                    'Success status sent to the Job Service API. (RequestID: ' . $holdRequest->getId() . ')'
+                );
 
                 self::getJobClient()->success(
                     new Job(['id' => $holdRequest->getJobId()]),
@@ -234,7 +239,9 @@ class JobService
                 self::buildJobNotice($data, self::JOB_FAILURE_MESSAGE);
                 self::getJobStatus()->setNotice(self::getJobNotice());
 
-                APILogger::addDebug('Failure status sent to the Job Service API.');
+                APILogger::addDebug(
+                    'Failure status sent to the Job Service API. (RequestID: ' . $holdRequest->getId() . ')'
+                );
 
                 self::getJobClient()->failure(
                     new Job(['id' => $holdRequest->getJobId()]),
@@ -242,7 +249,9 @@ class JobService
                 );
             }
         } catch (\Exception $exception) {
-            APILogger::addInfo('Job threw an exception. ' . $exception->getMessage());
+            APILogger::addInfo(
+                'Job threw an exception. ' . $exception->getMessage() . '. (RequestID: ' . $holdRequest->getId() . ')'
+            );
         }
     }
 

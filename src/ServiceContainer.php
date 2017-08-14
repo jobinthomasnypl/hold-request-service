@@ -1,6 +1,7 @@
 <?php
 namespace NYPL\Services;
 
+use NYPL\Starter\Config;
 use NYPL\Starter\DefaultContainer;
 
 /**
@@ -16,6 +17,6 @@ class ServiceContainer extends DefaultContainer
     public function __construct()
     {
         parent::__construct();
-        $this["settings"]["displayErrorDetails"] = true;
+        $this["settings"]["displayErrorDetails"] = Config::get('DISPLAY_ERRORS');
     }
 }

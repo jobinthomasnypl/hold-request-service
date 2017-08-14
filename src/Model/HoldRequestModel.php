@@ -213,7 +213,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getNumberOfCopies()
     {
@@ -221,7 +221,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @param string $numberOfCopies
+     * @param int $numberOfCopies
      */
     public function setNumberOfCopies($numberOfCopies)
     {
