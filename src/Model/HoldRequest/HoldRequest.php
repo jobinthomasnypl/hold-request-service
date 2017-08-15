@@ -20,6 +20,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
 {
     use DBCreateTrait, DBReadTrait, DBUpdateTrait;
 
+    const SCRUBBED_DATA_STRING = 'XXXXX';
     /**
      * @SWG\Property(example="229")
      * @var int
@@ -234,19 +235,63 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     /**
      * @throws \NYPL\Starter\APIException
      */
-    public function validateData()
+    public function validatePostData()
     {
-        APILogger::addDebug('Validating data for hold request.', $this->getRawData());
+        APILogger::addDebug('Validating POST request payload.');
 
         if ($this->getRequestType() != 'edd' && (!$this->getPickupLocation() && !$this->getDeliveryLocation())) {
-            APILogger::addDebug('No pickup/delivery location provided.', $this->getRawData());
-            throw new APIException('Missing pickupLocation and deliveryLocation values. One or both must be set.');
+            APILogger::addError(
+                'No pickup/delivery location provided.',
+                $this->getRawData()
+            );
+            $errorMsg = 'Missing pickup and delivery values. One or both must be set for general hold requests.';
+            throw new APIException($errorMsg, null, 0, null, 400);
         }
 
-        if ($this->getRequestType() === 'edd'
-            && !$this->docDeliveryData instanceof ElectronicDocumentData) {
-            APILogger::addDebug('EDD object not instantiated.', $this->getRawData());
-            throw new APIException('EDD request is missing all details.');
+        if ($this->getRequestType() === 'edd') {
+            $this->nullifyLocation();
+            if (!$this->docDeliveryData instanceof ElectronicDocumentData) {
+                APILogger::addError(
+                    'EDD object not instantiated.',
+                    $this->getRawData()
+                );
+                throw new APIException('EDD request is missing all details.', null, 0, null, 400);
+            }
         }
+
+        APILogger::addDebug('POST request payload validation passed.');
+    }
+
+    /**
+     * @throws \NYPL\Starter\APIException
+     */
+    public function validatePatchData(array $data)
+    {
+        APILogger::addDebug('Validating PATCH request payload.', $data);
+
+        if (!is_bool($data['success']) || !is_bool($data['processed'])) {
+            APILogger::addError('Success and processed flags must be boolean values.');
+            throw new APIException('Success and processed must be boolean values.', null, 0, null, 400);
+        }
+
+        APILogger::addDebug('PATCH request payload validation passed.');
+    }
+
+    /**
+     * Helper to ensure null values for location elements are set for consistency.
+     */
+    public function nullifyLocation()
+    {
+        $this->setPickupLocation(null);
+        $this->setDeliveryLocation(null);
+    }
+
+    public function getScrubbedData()
+    {
+        $data = $this->getRawData();
+
+        $data['patron'] = self::SCRUBBED_DATA_STRING;
+
+        return $data;
     }
 }

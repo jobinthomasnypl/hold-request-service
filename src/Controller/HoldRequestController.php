@@ -1,6 +1,7 @@
 <?php
 namespace NYPL\Services\Controller;
 
+use NYPL\Services\Filter\DateQueryFilter;
 use NYPL\Services\JobService;
 use NYPL\Services\ServiceController;
 use NYPL\Services\Model\HoldRequest\HoldRequest;
@@ -9,7 +10,6 @@ use NYPL\Services\Model\Response\HoldRequestErrorResponse;
 use NYPL\Services\Model\Response\HoldRequestsResponse;
 use NYPL\Starter\APIException;
 use NYPL\Starter\APILogger;
-use NYPL\Starter\Config;
 use NYPL\Starter\Filter;
 use NYPL\Starter\ModelSet;
 use Slim\Http\Request;
@@ -73,7 +73,13 @@ class HoldRequestController extends ServiceController
         try {
             if (!$this->isRequestAuthorized()) {
                 APILogger::addError('Invalid request received. Client not authorized to get bulk hold requests.');
-                return $this->invalidRequestResponse();
+                return $this->invalidScopeResponse(new APIException(
+                    'Client not authorized to create hold requests.',
+                    null,
+                    0,
+                    null,
+                    403
+                ));
             }
 
             $data = $this->getRequest()->getParsedBody();
@@ -83,17 +89,12 @@ class HoldRequestController extends ServiceController
 
             $holdRequest = new HoldRequest($data);
 
+            APILogger::addDebug('POST request sent.', $data);
+
             try {
-                $holdRequest->validateData();
+                $holdRequest->validatePostData();
             } catch (APIException $exception) {
-                return $this->getResponse()->withJson(
-                    new HoldRequestErrorResponse(
-                        500,
-                        'invalid_request',
-                        $exception->getMessage(),
-                        $exception
-                    )
-                )->withStatus(500);
+                return $this->invalidRequestResponse($exception);
             }
 
             $holdRequest->create();
@@ -106,14 +107,20 @@ class HoldRequestController extends ServiceController
             return $this->getResponse()->withJson(
                 new HoldRequestResponse($holdRequest)
             );
-        } catch (\Exception $exception) {
+        } catch (\AvroIOTypeException $exception) {
+            APILogger::addDebug('AvroIOTypeException thrown.', [$exception->getMessage()]);
             throw new APIException(
-                'An error occurred while creating a hold request. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
+                'Request could not be validated according to the Avro data model.',
+                $exception->getMessage(),
+                0,
                 $exception,
-                $this->getResponse()->getStatusCode()
+                400
             );
+        } catch (\Exception $exception) {
+            $errorType = 'create-hold-request-error';
+            $errorMsg = 'Unable to create hold request due to a problem with dependent services.';
+
+            return $this->processException($errorType, $errorMsg, $exception, $this->getRequest());
         }
     }
 
@@ -146,6 +153,13 @@ class HoldRequestController extends ServiceController
      *         type="string",
      *         description="Process status of a hold request."
      *     ),
+     *     @SWG\Parameter(
+     *         name="createdDate",
+     *         in="query",
+     *         required=false,
+     *         type="string",
+     *         description="Creation date of a hold request. (Format: YYYY-MM-DD)"
+     *     ),
      *     @SWG\Response(
      *         response=200,
      *         description="Successful operation",
@@ -169,30 +183,43 @@ class HoldRequestController extends ServiceController
      * )
      *
      * @return Response
-     * @throws APIException
      */
     public function getHoldRequests()
     {
         try {
-            if (!$this->hasReadRequestScope()) {
-                APILogger::addInfo('Invalid scope received. Client not authorized to get bulk hold requests.');
-                return $this->invalidRequestResponse();
+            if (!$this->isRequestAuthorized()) {
+                APILogger::addInfo('Invalid scope received. Client not authorized to get single hold requests.');
+                return $this->invalidScopeResponse(new APIException(
+                    'Client not authorized to retrieve hold requests.',
+                    null,
+                    0,
+                    null,
+                    403
+                ));
+            }
+
+            $dateFilter = null;
+            if ($this->getRequest()->getParam('createdDate')) {
+                $dateFilter = new DateQueryFilter(
+                    'createdDate',
+                    $this->getRequest()->getParam('createdDate'),
+                    false,
+                    '',
+                    'LIKE'
+                );
             }
 
             return  $this->getDefaultReadResponse(
                 new ModelSet(new HoldRequest()),
                 new HoldRequestsResponse(),
-                null,
+                $dateFilter,
                 ['patron', 'record', 'processed']
             );
         } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while getting bulk hold requests. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
+            $errorType = 'get-bulk-hold-requests-error';
+            $errorMsg = 'Unable to retrieve bulk hold requests. ' . $exception->getMessage();
+
+            return $this->processException($errorType, $errorMsg, $exception, $this->getRequest());
         }
     }
 
@@ -244,9 +271,15 @@ class HoldRequestController extends ServiceController
     public function getHoldRequest(Request $request, Response $response, array $args)
     {
         try {
-            if (!$this->hasReadRequestScope()) {
+            if (!$this->isRequestAuthorized()) {
                 APILogger::addInfo('Invalid scope received. Client not authorized to get single hold requests.');
-                return $this->invalidScopeResponse();
+                return $this->invalidScopeResponse(new APIException(
+                    'Client not authorized to retrieve hold requests.',
+                    null,
+                    0,
+                    null,
+                    403
+                ));
             }
 
             return  $this->getDefaultReadResponse(
@@ -255,13 +288,10 @@ class HoldRequestController extends ServiceController
                 new Filter(null, null, false, $args['id'])
             );
         } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while getting a single hold request. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
+            $errorType = 'get-hold-request-error';
+            $errorMsg = 'Unable to retrieve hold request. ' . $exception->getMessage();
+
+            return $this->processException($errorType, $errorMsg, $exception, $request);
         }
     }
 
@@ -314,19 +344,36 @@ class HoldRequestController extends ServiceController
      * @param array $args
      *
      * @return Response
-     * @throws APIException
      */
     public function updateHoldRequest(Request $request, Response $response, array $args)
     {
         try {
             if (!$this->isRequestAuthorized()) {
-                APILogger::addError('Invalid request received. Client not authorized to get bulk hold requests.');
-                return $this->invalidRequestResponse();
+                APILogger::addInfo('Invalid scope received. Client not authorized to update hold requests.');
+                return $this->invalidScopeResponse(new APIException(
+                    'Client not authorized to update hold requests.',
+                    null,
+                    0,
+                    null,
+                    403
+                ));
             }
+
+            $data = $this->getRequest()->getParsedBody();
 
             $holdRequest = new HoldRequest();
 
+            APILogger::addDebug('Raw PATCH request sent.', $request->getParsedBody());
+            APILogger::addDebug('PATCH request sent.', $data);
+
+            try {
+                $holdRequest->validatePatchData((array)$data);
+            } catch (APIException $exception) {
+                return $this->invalidRequestResponse($exception);
+            }
+
             $holdRequest->addFilter(new Filter('id', $args['id']));
+            $holdRequest->read();
 
             APILogger::addDebug('Hold request update initiated.');
 
@@ -334,24 +381,60 @@ class HoldRequestController extends ServiceController
                 $this->getRequest()->getParsedBody()
             );
 
-            $holdRequest->read();
-
             if ($this->isUseJobService()) {
                 APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
                 JobService::finishJob($holdRequest);
             }
 
-            return $this->getResponse()->withJson(
-                new HoldRequestResponse($holdRequest)
-            );
+            return $this->getResponse()->withJson(new HoldRequestResponse($holdRequest));
         } catch (\Exception $exception) {
-            throw new APIException(
-                'An error occurred while updating a hold request. ' . $exception->getMessage(),
-                [],
-                $exception->getCode(),
-                $exception,
-                $this->getResponse()->getStatusCode()
-            );
+            APILogger::addDebug('Exception thrown.', [$exception->getMessage()]);
+            $errorType = 'update-hold-request-error';
+            $errorMsg = 'Unable to update hold request.';
+
+            return $this->processException($errorType, $errorMsg, $exception, $request);
         }
+    }
+
+    /**
+     * @param string     $errorType
+     * @param string     $errorMessage
+     * @param \Exception $exception
+     * @param Request    $request
+     * @return \Slim\Http\Response
+     */
+    protected function processException($errorType, $errorMessage, \Exception $exception, Request $request)
+    {
+        $statusCode = 500;
+        if ($exception instanceof APIException) {
+            $statusCode = $exception->getHttpCode();
+        }
+
+        APILogger::addLog(
+            $statusCode,
+            get_class($exception) . ': ' . $exception->getMessage(),
+            [
+                $request->getHeaderLine('X-NYPL-Log-Stream-Name'),
+                $request->getHeaderLine('X-NYPL-Request-ID'),
+                (string) $request->getUri(),
+                $request->getParsedBody()
+            ]
+        );
+
+        if ($exception instanceof APIException) {
+            if ($exception->getPrevious()) {
+                $exception->setDebugInfo($exception->getPrevious()->getMessage());
+            }
+            APILogger::addDebug('APIException debug info.', [$exception->debugInfo]);
+        }
+
+        $errorResp = new HoldRequestErrorResponse(
+            $statusCode,
+            $errorType,
+            $errorMessage,
+            $exception
+        );
+
+        return $this->getResponse()->withJson($errorResp)->withStatus($statusCode);
     }
 }

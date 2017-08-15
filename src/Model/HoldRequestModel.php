@@ -155,7 +155,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getPickupLocation()
     {
@@ -163,7 +163,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @param string $pickupLocation
+     * @param null|string $pickupLocation
      */
     public function setPickupLocation($pickupLocation)
     {
@@ -171,7 +171,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getDeliveryLocation()
     {
@@ -179,7 +179,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @param string $deliveryLocation
+     * @param null|string $deliveryLocation
      */
     public function setDeliveryLocation($deliveryLocation)
     {
@@ -213,7 +213,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getNumberOfCopies()
     {
@@ -221,7 +221,7 @@ abstract class HoldRequestModel extends Model
     }
 
     /**
-     * @param string $numberOfCopies
+     * @param int $numberOfCopies
      */
     public function setNumberOfCopies($numberOfCopies)
     {
