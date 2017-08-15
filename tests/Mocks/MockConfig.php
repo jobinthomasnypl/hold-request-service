@@ -8,7 +8,7 @@ use NYPL\Starter\Config;
 class MockConfig extends Config
 {
     const ENVIRONMENT_FILE = '.env.sample';
-    const CONFIG_FILE = 'var_testing.env';
+    const CONFIG_FILE = 'mock.env';
 
     protected static $initialized = false;
 
@@ -90,8 +90,8 @@ class MockConfig extends Config
         $dotEnv = new Dotenv(self::getConfigDirectory(), self::ENVIRONMENT_FILE);
         $dotEnv->load();
 
-        if (file_exists(self::getConfigDirectory() . 'config/' . self::CONFIG_FILE)) {
-            $dotEnv = new Dotenv(self::getConfigDirectory() . 'config', self::CONFIG_FILE);
+        if (file_exists(self::getConfigDirectory() . 'tests/Mocks/' . self::CONFIG_FILE)) {
+            $dotEnv = new Dotenv(self::getConfigDirectory() . 'tests/Mocks/', self::CONFIG_FILE);
             $dotEnv->load();
         }
 
