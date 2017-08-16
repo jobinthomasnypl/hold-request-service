@@ -317,8 +317,8 @@ class HoldRequestController extends ServiceController
 
             $holdRequest = new HoldRequest();
 
-            APILogger::addDebug('Raw PATCH request sent.', $request->getParsedBody());
-            APILogger::addDebug('PATCH request sent.', $data);
+            APILogger::addDebug('Raw PATCH request sent.', [(string)$request->getUri(), $request->getParsedBody()]);
+            APILogger::addDebug('PATCH request sent.', [(string)$request->getUri(), $data]);
 
             try {
                 $holdRequest->validatePatchData((array)$data);
@@ -333,10 +333,17 @@ class HoldRequestController extends ServiceController
                 $this->getRequest()->getParsedBody()
             );
 
+            APILogger::addDebug('Database record updated.');
+
             if ($this->isUseJobService()) {
                 APILogger::addDebug('Updating an existing job.', ['jobID' => $holdRequest->getJobId()]);
                 JobService::finishJob($holdRequest);
             }
+
+            APILogger::addDebug(
+                'PATCH response',
+                (array)$this->getResponse()->withJson(new HoldRequestResponse($holdRequest))
+            );
 
             return $this->getResponse()->withJson(new HoldRequestResponse($holdRequest));
         } catch (\Exception $exception) {

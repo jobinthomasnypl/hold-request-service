@@ -84,6 +84,9 @@ class ServiceController extends Controller
         $this->useJobService = $useJobService;
     }
 
+    /**
+     * @return bool
+     */
     public function patronIsAuthorized()
     {
         APILogger::addDebug('Verifying patron is authorized.');
@@ -94,6 +97,9 @@ class ServiceController extends Controller
         return strcmp($requestIdentity, $tokenIdentity) === 0;
     }
 
+    /**
+     * @return bool
+     */
     protected function hasPatronIdentifier()
     {
         $params = $this->getRequest()->getQueryParams();
@@ -101,6 +107,9 @@ class ServiceController extends Controller
         return isset($params['patron']);
     }
 
+    /**
+     * @return bool
+     */
     public function isRequestAuthorized()
     {
         APILogger::addDebug('Verifying valid OAuth scope.');
@@ -111,7 +120,7 @@ class ServiceController extends Controller
             $hasScopeAccess = $this->hasWriteRequestScope();
         }
 
-        return $hasScopeAccess || $this->patronIsAuthorized();
+        return $hasScopeAccess;
     }
 
     /**
@@ -149,6 +158,9 @@ class ServiceController extends Controller
         );
     }
 
+    /**
+     * @return mixed
+     */
     protected function getPatronFromRequest()
     {
         APILogger::addDebug('Retrieving patron ID from request.');
@@ -156,12 +168,18 @@ class ServiceController extends Controller
         return $payload->patron;
     }
 
+    /**
+     * @return string
+     */
     protected function getPublicKey()
     {
         APILogger::addDebug('Retrieving public key.');
         return file_get_contents(__DIR__ . '/../config/pubkey.pem');
     }
 
+    /**
+     * @return mixed
+     */
     protected function getPatronFromToken()
     {
         APILogger::addDebug('Retrieving OAuth token.');
