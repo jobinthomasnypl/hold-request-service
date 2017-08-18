@@ -4,6 +4,7 @@ namespace NYPL\Services\Model\HoldRequest;
 use NYPL\Services\Model\ElectronicDocumentData;
 use NYPL\Starter\APIException;
 use NYPL\Starter\APILogger;
+use NYPL\Starter\Config;
 use NYPL\Starter\Model\LocalDateTime;
 use NYPL\Starter\Model\ModelInterface\MessageInterface;
 use NYPL\Starter\Model\ModelInterface\ReadInterface;
