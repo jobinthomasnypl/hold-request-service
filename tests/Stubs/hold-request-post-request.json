@@ -1,0 +1,10 @@
+{
+  "patron": "67793666",
+  "nyplSource": "sierra-nypl",
+  "requestType": "hold",
+  "recordType": "i",
+  "record": "32312222x",
+  "pickupLocation": "sasb",
+  "numberOfCopies": 1,
+  "docDeliveryData": null
+}
