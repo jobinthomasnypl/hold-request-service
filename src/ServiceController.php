@@ -3,6 +3,8 @@ namespace NYPL\Services;
 
 use Firebase\JWT\JWT;
 use NYPL\Services\Model\Response\HoldRequestErrorResponse;
+use NYPL\Starter\APILogger;
+use NYPL\Starter\Config;
 use NYPL\Starter\Controller;
 use Slim\Container;
 
@@ -37,6 +39,7 @@ class ServiceController extends Controller
      */
     public function __construct(Container $container, int $cacheSeconds = 0)
     {
+        $this->setUseJobService(Config::get('USE_JOB_SERVICE'));
         $this->setResponse($container->get('response'));
         $this->setRequest($container->get('request'));
 
@@ -81,14 +84,22 @@ class ServiceController extends Controller
         $this->useJobService = $useJobService;
     }
 
+    /**
+     * @return bool
+     */
     public function patronIsAuthorized()
     {
+        APILogger::addDebug('Verifying patron is authorized.');
+
         $requestIdentity = $this->getPatronFromRequest();
         $tokenIdentity = $this->getPatronFromToken();
 
         return strcmp($requestIdentity, $tokenIdentity) === 0;
     }
 
+    /**
+     * @return bool
+     */
     protected function hasPatronIdentifier()
     {
         $params = $this->getRequest()->getQueryParams();
@@ -96,15 +107,20 @@ class ServiceController extends Controller
         return isset($params['patron']);
     }
 
+    /**
+     * @return bool
+     */
     public function isRequestAuthorized()
     {
+        APILogger::addDebug('Verifying valid OAuth scope.');
+
         if ($this->getRequest()->getMethod() === 'GET') {
             $hasScopeAccess = $this->hasReadRequestScope();
         } else {
             $hasScopeAccess = $this->hasWriteRequestScope();
         }
 
-        return $hasScopeAccess || $this->patronIsAuthorized();
+        return $hasScopeAccess;
     }
 
     /**
@@ -142,50 +158,65 @@ class ServiceController extends Controller
         );
     }
 
+    /**
+     * @return mixed
+     */
     protected function getPatronFromRequest()
     {
+        APILogger::addDebug('Retrieving patron ID from request.');
         $payload = json_decode($this->getRequest()->getBody());
         return $payload->patron;
     }
 
+    /**
+     * @return string
+     */
     protected function getPublicKey()
     {
+        APILogger::addDebug('Retrieving public key.');
         return file_get_contents(__DIR__ . '/../config/pubkey.pem');
     }
 
+    /**
+     * @return mixed
+     */
     protected function getPatronFromToken()
     {
+        APILogger::addDebug('Retrieving OAuth token.');
         $token = $this->getIdentityHeader()->getToken();
-        $decoded = JWT::decode($token, $this->getPublicKey(), array('RS256'));
+        APILogger::addDebug('Decoding OAuth token.');
+        $decoded = JWT::decode($token, $this->getPublicKey(), ['RS256']);
 
         return $decoded->sub;
     }
 
     /**
+     * @param \Exception $exception
      * @return \Slim\Http\Response
      */
-    public function invalidScopeResponse()
+    public function invalidScopeResponse(\Exception $exception)
     {
         return $this->getResponse()->withJson(
             new HoldRequestErrorResponse(
                 '403',
                 'invalid-scope',
-                'Client does not have sufficient privileges.'
+                'Client does not have sufficient privileges. ' . $exception->getMessage()
             )
         )->withStatus(403);
     }
 
     /**
+     * @param \Exception $exception
      * @return \Slim\Http\Response
      */
-    public function invalidRequestResponse()
+    public function invalidRequestResponse(\Exception $exception)
     {
         return $this->getResponse()->withJson(
             new HoldRequestErrorResponse(
-                '403',
+                '400',
                 'invalid-request',
-                'Client does not have sufficient privileges.'
+                'An invalid request was sent to the API. ' . $exception->getMessage()
             )
-        )->withStatus(403);
+        )->withStatus(400);
     }
 }
