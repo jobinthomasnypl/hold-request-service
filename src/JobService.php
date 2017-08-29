@@ -224,7 +224,7 @@ class JobService
 
         try {
             if ($holdRequest->isSuccess()) {
-                self::buildJobNotice($data, self::JOB_SUCCESS_MESSAGE);
+                self::buildJobNotice($data, self::JOB_SUCCESS_MESSAGE . ' (RequestID: ' . $holdRequest->getId() . ')');
                 self::getJobStatusSuccess()->setNotice(self::getJobNotice());
 
                 APILogger::addDebug(
@@ -236,7 +236,7 @@ class JobService
                     self::getJobStatusSuccess()
                 );
             } else {
-                self::buildJobNotice($data, self::JOB_FAILURE_MESSAGE);
+                self::buildJobNotice($data, self::JOB_FAILURE_MESSAGE . ' (RequestID: ' . $holdRequest->getId() . ')');
                 self::getJobStatus()->setNotice(self::getJobNotice());
 
                 APILogger::addDebug(
