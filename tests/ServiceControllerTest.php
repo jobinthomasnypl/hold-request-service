@@ -85,7 +85,7 @@ class ServiceControllerTest extends TestCase
 
         $controller->setIdentityHeader(new IdentityHeader($controller->request->getHeader('X-NYPL-Identity')[0]));
 
-        self::assertTrue($controller->isRequestAuthorized());
+        self::assertFalse($controller->isRequestAuthorized());
     }
 
     /**
