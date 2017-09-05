@@ -246,7 +246,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
                 'No pickup/delivery location provided.',
                 $this->getRawData()
             );
-            $errorMsg = 'Missing pickup and delivery values. One or both must be set for general hold requests.';
+            $errorMsg = 'Missing pickup and delivery values. One or both must be set for non-EDD requests.';
             throw new APIException($errorMsg, null, 0, null, 400);
         }
 
@@ -280,7 +280,7 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
     }
 
     /**
-     * Helper to ensure null values for location elements are set for consistency.
+     * Helper method to ensure EDD requests have null values for location elements are set for consistency.
      */
     public function nullifyLocation()
     {
@@ -288,6 +288,11 @@ class HoldRequest extends NewHoldRequest implements MessageInterface, ReadInterf
         $this->setDeliveryLocation(null);
     }
 
+    /**
+     * Helper method to make sensitive data anonymous.
+     *
+     * @return array
+     */
     public function getScrubbedData()
     {
         $data = $this->getRawData();
